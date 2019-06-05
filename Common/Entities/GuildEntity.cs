@@ -21,6 +21,8 @@ namespace BonusBot.Common.Entities
         public string GitHubWebHookListenToUrl { get; set; }
         public string WelcomeMessage { get; set; }
         public string UserLeftMessage { get; set; }
+        public bool UseRolesCommandSystem { get; set; }
+
         [NotConfigurableProperty]
         public uint LastPlayerVolume { get; set; }
     }

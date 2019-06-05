@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,12 +26,11 @@ namespace BonusBot.Common.Handlers
 
         public async Task RefreshTrack(LavaPlayer player)
         {
-            await DoWithSemaphore(player, async (player) => 
+            await DoWithSemaphore(player, async (player) =>
             {
                 EmbedInfo embedInfo = await GetAudioInfoEmbedInfo((SocketGuild)player.VoiceChannel.Guild);
                 await UpdateEmbed(embedInfo, player, async (info, p) => await GetRefreshedAudioInfo(info.Embed, p.CurrentTrack));
             });
-            
         }
 
         public async Task RefreshVolume(LavaPlayer player)
@@ -59,7 +57,7 @@ namespace BonusBot.Common.Handlers
             {
                 EmbedInfo embedInfo = await GetAudioInfoEmbedInfo((SocketGuild)player.VoiceChannel.Guild);
                 await UpdateEmbed(embedInfo, player, (info, p) => GetRefreshedStatus(info.Embed, p));
-            }); 
+            });
         }
 
         private async Task DoWithSemaphore(LavaPlayer player, Func<LavaPlayer, Task> toDo)
@@ -198,7 +196,6 @@ namespace BonusBot.Common.Handlers
                 builder.Fields[2].Value = "-";
                 builder.Fields[3].Value = "-";
             }
-            
         }
 
         private static void AddQueueInfo(EmbedBuilder builder, LavaQueue queue)

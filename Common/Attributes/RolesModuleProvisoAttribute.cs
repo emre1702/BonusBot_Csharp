@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using BonusBot.Common.Defaults;
 using BonusBot.Common.Entities;
 using BonusBot.Common.ExtendedModules;
 using BonusBot.Common.Handlers;
@@ -20,9 +18,12 @@ namespace BonusBot.Common.Attributes
             var databaseHandler = services.GetRequiredService<DatabaseHandler>();
             var guildEntity = databaseHandler.Get<GuildEntity>(ctx.Guild.Id);
 
-            if (guildEntity.RolesRequestChannelId != default) 
+            if (guildEntity.RolesRequestChannelId != default)
                 if (ctx.Channel.Id != guildEntity.RolesRequestChannelId)
                     return Task.FromResult(PreconditionResult.FromError($"Only allowed in {ctx.Guild.GetChannel(guildEntity.RolesRequestChannelId)?.Name ?? "?"} channel."));
+
+            if (!guildEntity.UseRolesCommandSystem)
+                return Task.FromResult(PreconditionResult.FromError($"Only allowed with bot reactions in {ctx.Guild.GetChannel(guildEntity.RolesRequestChannelId)?.Name ?? " ? "} channel."));
 
             return Task.FromResult(PreconditionResult.FromSuccess());
         }

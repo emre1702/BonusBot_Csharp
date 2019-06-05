@@ -47,7 +47,7 @@ namespace AdminAssembly
                 int missingAmount = limit - messagesToDelete.Count;
                 if (amountFetched > missingAmount)
                     messages = messages.Take(missingAmount);
-                    
+
                 messagesToDelete.AddRange(messages);
             }
             while (messagesToDelete.Count < limit);

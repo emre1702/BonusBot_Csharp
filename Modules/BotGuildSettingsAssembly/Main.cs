@@ -20,11 +20,13 @@ namespace BotGuildSettingsAssembly
     public sealed class BotGuildSettingsModule : CommandBase
     {
         private readonly DatabaseHandler _databaseHandler;
+        private readonly RoleReactionHandler _roleReactionHandler;
         private GuildEntity _guildEntity;
 
-        public BotGuildSettingsModule(DatabaseHandler databaseHandler)
+        public BotGuildSettingsModule(DatabaseHandler databaseHandler, RoleReactionHandler roleReactionHandler)
         {
             _databaseHandler = databaseHandler;
+            _roleReactionHandler = roleReactionHandler;
         }
 
 
@@ -37,6 +39,7 @@ namespace BotGuildSettingsAssembly
         protected override void AfterExecute(CommandInfo command)
         {
             _databaseHandler.Save(_guildEntity);
+            _roleReactionHandler.InitForGuild(Context.Guild);
             base.AfterExecute(command);
         }
 
@@ -92,18 +95,19 @@ namespace BotGuildSettingsAssembly
         {
             return _guildEntity.GetType()
                 .GetProperties()
-                .Where(p => p.CanWrite 
+                .Where(p => p.CanWrite
                     && p.GetCustomAttribute<NotConfigurablePropertyAttribute>() == null)
-                 .Select(p => p.Name);
+                 .Select(p => $"{p.Name} ({p.PropertyType.Name})" );
         }
 
         private IEnumerable<string> GetNotSettedProperties()
         {
             return _guildEntity.GetType().GetProperties()
                 .Where(p => p.CanWrite
+                    && p.PropertyType != typeof(bool)   // false is default
                     && p.GetCustomAttribute<NotConfigurablePropertyAttribute>() == null
                     && IsDefault(p.GetValue(_guildEntity)))
-                .Select(p => p.Name);
+                .Select(p => $"{p.Name} ({p.PropertyType.Name})");
         }
 
         private bool IsDefault(object value)
@@ -112,10 +116,10 @@ namespace BotGuildSettingsAssembly
                 return true;
             Type type = value.GetType();
             if (!type.IsValueType)
-                return false; 
+                return false;
             if (Nullable.GetUnderlyingType(type) != null)
                 return false;
-            object defaultValue = Activator.CreateInstance(type); 
+            object defaultValue = Activator.CreateInstance(type);
             return value.Equals(defaultValue);
         }
 
@@ -139,6 +143,10 @@ namespace BotGuildSettingsAssembly
                     if (value.Length != 1)
                         return null;
                     return value[0];
+                case Type boolType when boolType == typeof(bool):
+                    if (value != "1" && value != "0" && !value.Equals("true", StringComparison.CurrentCultureIgnoreCase) && !value.Equals("false", StringComparison.CurrentCultureIgnoreCase))
+                        return null;
+                    return value == "1" || value.Equals("true", StringComparison.CurrentCultureIgnoreCase);
             }
             return value;
         }

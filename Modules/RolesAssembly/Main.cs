@@ -4,8 +4,6 @@ using BonusBot.Common.ExtendedModules;
 using System.Threading.Tasks;
 using BonusBot.Common.Handlers;
 using BonusBot.Common.Entities;
-using Discord.WebSocket;
-using Discord;
 
 namespace RolesAssembly
 {

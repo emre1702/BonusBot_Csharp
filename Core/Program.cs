@@ -6,7 +6,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using InfluxDB.Collector;
 using Microsoft.Extensions.DependencyInjection;
-using BonusBot.Common.Entities;
 using BonusBot.Core.Handlers;
 using BonusBot.Common.Helpers;
 using BonusBot.Common.Interfaces;
@@ -37,14 +36,15 @@ namespace BonusBot.Core
             });
             _provider = new ServiceCollection()
                 .AddImplementedInterfaces(_assembly, typeof(IJob), typeof(IHandler))
-                .AddServices(typeof(LavaSocketClient), 
-                    typeof(LavaRestClient), 
-                    typeof(SettingsHandler), 
+                .AddServices(typeof(LavaSocketClient),
+                    typeof(LavaRestClient),
+                    typeof(SettingsHandler),
                     typeof(DatabaseHandler),
                     typeof(TrackHandler),
                     typeof(NewPlayerHandler),
                     typeof(AudioInfoHandler),
-                    typeof(RolesHandler))
+                    typeof(RolesHandler),
+                    typeof(RoleReactionHandler))
                 .AddSingleton(command)
                 .AddSingleton(socketClient)
                 .BuildServiceProvider();

@@ -32,7 +32,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebHook", "WebHook\WebHook.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdminAssembly", "Modules\AdminAssembly\AdminAssembly.csproj", "{95363EE7-26CC-47B6-9668-90696D27EDD9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilityAssembly", "Modules\UtilityAssembly\UtilityAssembly.csproj", "{3BE16DBC-C9FB-457B-84BE-5CEBF6ED18E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UtilityAssembly", "Modules\UtilityAssembly\UtilityAssembly.csproj", "{3BE16DBC-C9FB-457B-84BE-5CEBF6ED18E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

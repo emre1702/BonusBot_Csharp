@@ -28,10 +28,11 @@ namespace BonusBot.Core.Handlers
         private readonly LavaSocketClient _lavaSocketClient;
         private readonly DatabaseHandler _databaseHandler;
         private readonly RolesHandler _rolesHandler;
+        private readonly RoleReactionHandler _roleReactionHandler;
 
         public EventsHandler(IServiceProvider provider,
             DiscordSocketClient socketClient, CommandService commandService, MetricsJob metricsJob, JobHandler jobHandler,
-            LavaSocketClient lavaSocketClient, DatabaseHandler databaseHandler, RolesHandler rolesHandler)
+            LavaSocketClient lavaSocketClient, DatabaseHandler databaseHandler, RolesHandler rolesHandler, RoleReactionHandler roleReactionHandler)
         {
             _socketClient = socketClient;
             _commandService = commandService;
@@ -40,6 +41,7 @@ namespace BonusBot.Core.Handlers
             _jobHandler = jobHandler;
             _databaseHandler = databaseHandler;
             _rolesHandler = rolesHandler;
+            _roleReactionHandler = roleReactionHandler;
 
             _lavaSocketClient = lavaSocketClient;
             _lavaSocketClient.Log += OnLog;
@@ -129,6 +131,7 @@ namespace BonusBot.Core.Handlers
 
             foreach (var guild in _socketClient.Guilds)
             {
+                _roleReactionHandler.InitForGuild(guild);
                 CreateGitHubListenerForGuild(guild);
             }
         }
@@ -226,16 +229,42 @@ namespace BonusBot.Core.Handlers
             return true;
         }
 
-        private Task OnReactionAdded(Cacheable<IUserMessage, ulong> cache, ISocketMessageChannel channel,
+        private async Task OnReactionAdded(Cacheable<IUserMessage, ulong> cache, ISocketMessageChannel channel,
             SocketReaction reaction)
         {
-            return Task.CompletedTask;
+            var guildId = channel.CastTo<SocketGuildChannel>().Guild.Id;
+            var guild = _databaseHandler.Get<GuildEntity>(guildId);
+            await CheckRoleReactionAdded(guild, reaction);
         }
 
-        private Task OnReactionRemoved(Cacheable<IUserMessage, ulong> cache, ISocketMessageChannel channel,
+        private async Task CheckRoleReactionAdded(GuildEntity guild, SocketReaction reaction)
+        {
+            if (guild.UseRolesCommandSystem)
+                return;
+            if (guild.RolesRequestChannelId != reaction.Channel.Id)
+                return;
+            if (!reaction.User.IsSpecified || reaction.User.Value.IsBot)
+                return;
+            await _roleReactionHandler.HandleRoleReactionAdded(guild, reaction);
+        }
+
+        private async Task OnReactionRemoved(Cacheable<IUserMessage, ulong> cache, ISocketMessageChannel channel,
             SocketReaction reaction)
         {
-            return Task.CompletedTask;
+            var guildId = channel.CastTo<SocketGuildChannel>().Guild.Id;
+            var guild = _databaseHandler.Get<GuildEntity>(guildId);
+            await CheckRoleReactionRemoved(guild, reaction);
+        }
+
+        private async Task CheckRoleReactionRemoved(GuildEntity guild, SocketReaction reaction)
+        {
+            if (guild.UseRolesCommandSystem)
+                return;
+            if (guild.RolesRequestChannelId != reaction.Channel.Id)
+                return;
+            if (!reaction.User.IsSpecified || reaction.User.Value.IsBot)
+                return;
+            await _roleReactionHandler.HandleRoleReactionRemoved(guild, reaction);
         }
 
         private Task OnCommandExecuted(Optional<CommandInfo> optional, ICommandContext basicContext, IResult result)

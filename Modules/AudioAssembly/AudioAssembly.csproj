@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <OutDir>..\..\Core\bin\Debug\netcoreapp3.0\Modules\</OutDir>
+    <RepositoryUrl />
   </PropertyGroup>
 
   <ItemGroup>

@@ -10,8 +10,8 @@ namespace AdminAssembly
     {
 
         [Command("mute")]
-        [Alias("TimeMute", "TMute", "MuteTime", "MuteT", "PermaMute", "PMute", "MuteP", 
-            "MutePerma", "PermanentMute", "MutePermanent", "UMute", "MuteU", "UnMute", "MuteUn", 
+        [Alias("TimeMute", "TMute", "MuteTime", "MuteT", "PermaMute", "PMute", "MuteP",
+            "MutePerma", "PermanentMute", "MutePermanent", "UMute", "MuteU", "UnMute", "MuteUn",
             "RemoveMute", "MuteRemove", "DeleteMute", "MuteDelete", "DelMute", "MuteDel")]
         [RequireUserPermission(GuildPermission.MuteMembers)]
         public async Task MuteMember(string targetMention, string time, [Remainder] string reason)
@@ -43,7 +43,7 @@ Please use with X as number:
 '0', 'unmute', 'no' or 'stop' for unmute.");
                 return;
             }
-                
+
             if (!dateTimeOffset.HasValue && !isPerma)   // unmute
             {
                 if (previousMute != null)
@@ -87,6 +87,6 @@ Please use with X as number:
             return ReplyAsync(mute.ToEmbedBuilder(Context.Client));
         }
 
-        
+
     }
 }
