@@ -7,6 +7,7 @@ using BonusBot.Common.Helpers;
 using Discord;
 using Newtonsoft.Json;
 using WebHook.Entity.GitHub;
+using WebHook.PostHandler;
 
 namespace BonusBot.WebHook
 {
@@ -16,12 +17,14 @@ namespace BonusBot.WebHook
         private readonly Action<string, LogSeverity, Exception> _logger;
         private readonly ITextChannel _outputToChannel;
         private readonly string _url;
+        private readonly Handler _postHandler;
 
-        public GitHubListener(string url, ITextChannel outputToChannel, Action<string, LogSeverity, Exception> Logger)
+        public GitHubListener(string url, ITextChannel outputToChannel, Action<string, LogSeverity, Exception> logger)
         {
             _url = url;
             _outputToChannel = outputToChannel;
-            _logger = Logger;
+            _logger = logger;
+            _postHandler = new Handler(outputToChannel, logger);
 
             CreateListener();
             StartListenerAsync();
@@ -101,7 +104,7 @@ namespace BonusBot.WebHook
                     responseContent = readStream.ReadToEnd();
 
                 if (path.StartsWith("/echoPost"))
-                    await HandleEchoPost(responseContent);
+                    await _postHandler.HandleEchoPost(responseContent);
 
                 var response = context.Response;
                 response.StatusCode = (int)HttpStatusCode.OK;
@@ -114,26 +117,6 @@ namespace BonusBot.WebHook
             {
                 _logger("Error at reading GitHub request", LogSeverity.Error, ex);
             }
-        }
-
-        private async Task HandleEchoPost(string content)
-        {
-            var o = JsonConvert.DeserializeObject<Base>(content);
-            EmbedBuilder builder = new EmbedBuilder()
-                .WithAuthor(o.Sender.Username, o.Sender.AvatarUrl, o.Sender.UserUrl)
-                .WithColor(0, 0, 150)
-                .WithTitle($"[{o.Repository.Name}:{o.Branch}] {o.Commits.Length} new commit(s).")
-                .WithUrl(o.HeadCommit.Url);
-                //.WithTimestamp(DateTimeOffset.Parse(o.HeadCommit.Timestamp).ToLocalTime());
-
-            var strBuilder = new StringBuilder();
-            foreach (var commit in o.Commits)
-            {
-                strBuilder.AppendLine($"[`{commit.Id.Substring(0, 7)}`]({commit.Url}) {commit.Message}");
-            }
-            builder.WithDescription(strBuilder.ToString());
-
-            await _outputToChannel.SendMessageAsync(embed: builder.Build());
         }
     }
 

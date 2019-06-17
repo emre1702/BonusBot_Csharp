@@ -2,7 +2,7 @@
 
 namespace WebHook.Entity.GitHub
 {
-    class Sender
+    class User
     {
         [JsonProperty("login")]
         public string Username { get; set; }
@@ -13,7 +13,7 @@ namespace WebHook.Entity.GitHub
         [JsonProperty("avatar_url")]
         public string AvatarUrl { get; set; }
 
-      
+
 
         //[JsonProperty("id")]
         //[JsonProperty("node_id")]

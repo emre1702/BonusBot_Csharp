@@ -8,7 +8,7 @@ namespace WebHook.Entity.GitHub
         public string Ref { get; set; }
 
         [JsonProperty("sender")]
-        public Sender Sender { get; set; }
+        public User Sender { get; set; }
 
         [JsonProperty("repository")]
         public Repository Repository { get; set; }
@@ -19,7 +19,11 @@ namespace WebHook.Entity.GitHub
         [JsonProperty("head_commit")]
         public Commit HeadCommit { get; set; }
 
+        [JsonProperty("action")]
+        public string Action { get; set; }
 
+        [JsonProperty("issue")]
+        public Issue Issue { get; set; }
 
         [JsonIgnore]
         public string Branch => Ref.Split('/')[^1];
