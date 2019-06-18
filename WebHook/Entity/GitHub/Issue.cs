@@ -4,8 +4,8 @@ namespace WebHook.Entity.GitHub
 {
     class Issue
     {
-        [JsonProperty("url")]
-        public string Url { get; set; }
+        [JsonProperty("html_url")]
+        public string HtmlUrl { get; set; }
 
         [JsonProperty("title")]
         public string Title { get; set; }

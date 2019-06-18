@@ -11,7 +11,7 @@ namespace WebHook.PostHandler
                    .WithAuthor(o.Sender.Username, o.Sender.AvatarUrl, o.Sender.UserUrl)
                    .WithColor(100, 0, 0)
                    .WithTitle("[CLOSED] " + o.Issue.Title)
-                   .WithUrl(o.Issue.Url)
+                   .WithUrl(o.Issue.HtmlUrl)
                    .WithDescription(o.Issue.Body);
 
             return builder.Build();
