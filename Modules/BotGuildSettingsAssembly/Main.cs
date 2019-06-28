@@ -51,7 +51,7 @@ namespace BotGuildSettingsAssembly
             builder.AppendLine("To do this, use 'config [SETTING] [VALUE]'.");
             builder.AppendLine("Example: '!config Prefix ?'");
             builder.AppendLine("Possible settings are:");
-            builder.AppendJoin(", ", GetAvailablePropertyNames());
+            builder.AppendJoin("\n", GetAvailablePropertyNames());
 
             var notSetted = GetNotSettedProperties();
             if (notSetted.Any())
