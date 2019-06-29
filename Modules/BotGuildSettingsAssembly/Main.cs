@@ -11,6 +11,8 @@ using System;
 using BonusBot.Common.Helpers;
 using BonusBot.Common.Attributes;
 using System.Collections.Generic;
+using Common.Attributes;
+using Common.Handlers;
 
 namespace BotGuildSettingsAssembly
 {
@@ -75,6 +77,8 @@ namespace BotGuildSettingsAssembly
                 return ReplyAsync($"Invalid value! The type has to be {prop.PropertyType.Name}.");
 
             prop.SetValue(_guildEntity, setValue, null);
+            if (prop.GetCustomAttribute<GitHubWebHookSettingProperty>() != null)
+                ModuleEventsHandler.OnGitHubWebHookSettingChanged(Context.Guild);
             return ReplyAsync("Setting changed successfully.");
 
             //todo restart GitHubListener after changing a github setting

@@ -6,13 +6,14 @@ namespace WebHook.PostHandler
 {
     static class Push
     {
-        public static Embed Handle(Base o)
+        public static EmbedBuilder Handle(Base o)
         {
             var builder = new EmbedBuilder()
                    .WithAuthor(o.Sender.Username, o.Sender.AvatarUrl, o.Sender.UserUrl)
                    .WithColor(0, 0, 150)
                    .WithTitle($"[{o.Repository.Name}:{o.Branch}] {o.Commits.Length} new commit(s).")
-                   .WithUrl(o.HeadCommit.Url);
+                   .WithUrl(o.HeadCommit.Url)
+                   .WithFooter("Changes pushed");
             //.WithTimestamp(DateTimeOffset.Parse(o.HeadCommit.Timestamp).ToLocalTime());
 
             var strBuilder = new StringBuilder();
@@ -22,7 +23,7 @@ namespace WebHook.PostHandler
             }
             builder.WithDescription(strBuilder.ToString());
 
-            return builder.Build();
+            return builder;
         }
     }
 }

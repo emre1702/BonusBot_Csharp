@@ -1,7 +1,16 @@
 ﻿namespace WebHook
 {
-    enum PostType
+    public enum PostType
     {
-        Commits, IssueMilestoned, IssueLabeled, IssueAssigned, IssueEdited, IssueOpened, IssueClosed, Unknown
+        Push,
+        IssueOpened,
+        IssueClosed,
+        IssueCommented,
+        IssueInitialCommentEdited,
+        IssueNeedTestingAdded,
+        IssueNeedTestingRemoved,
+        IssueHelpWantedAdded,
+        IssueHelpWantedRemoved,
+        Unknown
     }
 }

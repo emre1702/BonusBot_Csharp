@@ -17,7 +17,7 @@ namespace WebHook.Entity.GitHub
         public string Timestamp { get; set; }
 
         //[JsonProperty("committer")]
-        //public Author Commiter { get; set; } 
+        //public Author Commiter { get; set; }
 
         //[JsonProperty("tree_id")]
         //[JsonProperty("distinct")]

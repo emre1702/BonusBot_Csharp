@@ -25,6 +25,15 @@ namespace WebHook.Entity.GitHub
         [JsonProperty("issue")]
         public Issue Issue { get; set; }
 
+        [JsonProperty("comment")]
+        public Comment Comment { get; set; }
+
+        [JsonProperty("label")]
+        public Label Label { get; set; }
+
+        [JsonProperty("changes")]
+        public Changes Changes { get; set; }
+
         [JsonIgnore]
         public string Branch => Ref.Split('/')[^1];
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using BonusBot.Common.Helpers;
 using Discord;
 using Newtonsoft.Json;
+using WebHook.Entity;
 using WebHook.Entity.GitHub;
 using WebHook.PostHandler;
 
@@ -13,21 +15,42 @@ namespace BonusBot.WebHook
 {
     public class GitHubListener
     {
+        private static Dictionary<ulong, GitHubListener> _createdListeners = new Dictionary<ulong, GitHubListener>();
+
         private HttpListener _listener;
         private readonly Action<string, LogSeverity, Exception> _logger;
-        private readonly ITextChannel _outputToChannel;
+        private readonly GuildWebHookSettings _settings;
         private readonly string _url;
         private readonly Handler _postHandler;
 
-        public GitHubListener(string url, ITextChannel outputToChannel, Action<string, LogSeverity, Exception> logger)
+        public GitHubListener(string url, GuildWebHookSettings settings, Action<string, LogSeverity, Exception> logger)
         {
+            if (_createdListeners.ContainsKey(settings.Guild.Id))
+            {
+                _createdListeners[settings.Guild.Id].Stop();
+            }
+
             _url = url;
-            _outputToChannel = outputToChannel;
+            _settings = settings;
             _logger = logger;
-            _postHandler = new Handler(outputToChannel, logger);
+            _postHandler = new Handler(settings, logger);
+
+            _createdListeners[settings.Guild.Id] = this;
 
             CreateListener();
             StartListenerAsync();
+        }
+
+        public GitHubListener(string url, GuildWebHookSettings settings) : this(url, settings, (msg, severity, ex) =>
+        {
+            ConsoleHelper.Log(severity, "WebHook", $"WebHook [{severity.ToString()}]: {msg}:", ex);
+        })
+        { }
+
+        public void Stop()
+        {
+            _listener?.Close();
+            _listener = null;
         }
 
         private bool CreateListener()
@@ -60,6 +83,7 @@ namespace BonusBot.WebHook
                 catch (HttpListenerException)
                 {
                     _listener.Close();
+                    _listener = null;
                     return;
                 }
                 catch (ObjectDisposedException)
@@ -81,20 +105,17 @@ namespace BonusBot.WebHook
                 return;
             }
 
-            ConsoleHelper.Log(LogSeverity.Info, "WebHook", $"GitHub Listener started for guild {_outputToChannel.Guild.Name}.");
+            ConsoleHelper.Log(LogSeverity.Info, "WebHook", $"GitHub Listener started for guild {_settings.Guild.Name}.");
 
             _listener.BeginGetContext(HandleContext, null);
         }
-
-        public GitHubListener(string url, ITextChannel outputToChannel) : this(url, outputToChannel, (msg, severity, ex) =>
-        {
-            ConsoleHelper.Log(severity, "WebHook", $"WebHook [{severity.ToString()}]: {msg}:", ex);
-        }) { }
 
         private async void HandleContext(IAsyncResult result)
         {
             try
             {
+                if (_listener == null)
+                    return;
                 var context = _listener.EndGetContext(result);
                 var path = context.Request.Url.LocalPath;
                 string responseContent = null;

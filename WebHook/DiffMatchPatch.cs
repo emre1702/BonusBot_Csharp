@@ -1572,6 +1572,76 @@ namespace DiffMatchPatch
         }
 
         /**
+         * Convert a Diff list into a pretty Discord embed body.
+         * @param diffs List of Diff objects.
+         * @return Embed body representation.
+         */
+        public string DiffEmbedBody(List<Diff> diffs)
+        {
+            StringBuilder insertBuilder = new StringBuilder();
+            StringBuilder removeBuilder = new StringBuilder();
+            for (int i = 0; i < diffs.Count; ++i)
+            {
+                Diff aDiff = diffs[i];
+                switch (aDiff.operation)
+                {
+                    case Operation.INSERT:
+                        var prevDiff1 = GetPreviousEqualDiff(diffs, i);
+                        if (prevDiff1 != null)
+                            insertBuilder.Append(prevDiff1.text.Split('\n')[^1]);
+                        insertBuilder.Append(aDiff.text);
+                        var nextDiff1 = GetNextEqualDiff(diffs, i);
+                        if (nextDiff1 != null)
+                            insertBuilder.Append(nextDiff1.text.Split('\n')[0]);
+                        break;
+                    case Operation.DELETE:
+                        var prevDiff2 = GetPreviousEqualDiff(diffs, i);
+                        if (prevDiff2 != null)
+                            removeBuilder.Append(prevDiff2.text.Split('\n')[^1]);
+                        removeBuilder.Append("~~").Append(aDiff.text)
+                            .Append("~~");
+                        var nextDiff2 = GetNextEqualDiff(diffs, i);
+                        if (nextDiff2 != null)
+                            removeBuilder.Append(nextDiff2.text.Split('\n')[0]);
+                        break;
+                }
+            }
+
+            bool hasInsert = insertBuilder.Length > 0;
+            bool hasRemove = removeBuilder.Length > 0;
+            if (hasRemove)
+                removeBuilder.Insert(0, "Removed:\n");
+
+            if (hasInsert)
+                insertBuilder.Insert(0, "New:\n");
+
+            if (hasInsert && hasRemove)
+                removeBuilder.AppendLine("\n");
+
+            return removeBuilder.ToString() + insertBuilder.ToString();
+        }
+
+        private Diff GetPreviousEqualDiff(List<Diff> diffs, int currentIndex)
+        {
+            for (int i = currentIndex - 1; i >= 0; --i)
+            {
+                if (diffs[i].operation == Operation.EQUAL)
+                    return diffs[i];
+            }
+            return null;
+        }
+
+        private Diff GetNextEqualDiff(List<Diff> diffs, int currentIndex)
+        {
+            for (int i = currentIndex + 1; i < diffs.Count; ++i)
+            {
+                if (diffs[i].operation == Operation.EQUAL)
+                    return diffs[i];
+            }
+            return null;
+        }
+
+        /**
          * Compute and return the source text (all equalities and deletions).
          * @param diffs List of Diff objects.
          * @return Source text.
@@ -1806,7 +1876,7 @@ namespace DiffMatchPatch
             else
             {
                 // Do a fuzzy compare.
-                return match_bitap(text, pattern, loc);
+                return MatchBitap(text, pattern, loc);
             }
         }
 
@@ -1818,13 +1888,13 @@ namespace DiffMatchPatch
          * @param loc The location to search around.
          * @return Best match index or -1.
          */
-        protected int match_bitap(string text, string pattern, int loc)
+        protected int MatchBitap(string text, string pattern, int loc)
         {
             // assert (Match_MaxBits == 0 || pattern.Length <= Match_MaxBits)
             //    : "Pattern too long for this application.";
 
             // Initialise the alphabet.
-            Dictionary<char, int> s = match_alphabet(pattern);
+            Dictionary<char, int> s = MatchAlphabet(pattern);
 
             // Highest score beyond which we give up.
             double score_threshold = Match_Threshold;
@@ -1832,7 +1902,7 @@ namespace DiffMatchPatch
             int best_loc = text.IndexOf(pattern, loc, StringComparison.Ordinal);
             if (best_loc != -1)
             {
-                score_threshold = Math.Min(match_bitapScore(0, best_loc, loc,
+                score_threshold = Math.Min(MatchBitapScore(0, best_loc, loc,
                     pattern), score_threshold);
                 // What about in the other direction? (speedup)
                 best_loc = text.LastIndexOf(pattern,
@@ -1840,7 +1910,7 @@ namespace DiffMatchPatch
                     StringComparison.Ordinal);
                 if (best_loc != -1)
                 {
-                    score_threshold = Math.Min(match_bitapScore(0, best_loc, loc,
+                    score_threshold = Math.Min(MatchBitapScore(0, best_loc, loc,
                         pattern), score_threshold);
                 }
             }
@@ -1862,7 +1932,7 @@ namespace DiffMatchPatch
                 bin_mid = bin_max;
                 while (bin_min < bin_mid)
                 {
-                    if (match_bitapScore(d, loc + bin_mid, loc, pattern)
+                    if (MatchBitapScore(d, loc + bin_mid, loc, pattern)
                         <= score_threshold)
                     {
                         bin_min = bin_mid;
@@ -1905,7 +1975,7 @@ namespace DiffMatchPatch
                     }
                     if ((rd[j] & matchmask) != 0)
                     {
-                        double score = match_bitapScore(d, j - 1, loc, pattern);
+                        double score = MatchBitapScore(d, j - 1, loc, pattern);
                         // This match will almost certainly be better than any existing
                         // match.  But check anyway.
                         if (score <= score_threshold)
@@ -1926,7 +1996,7 @@ namespace DiffMatchPatch
                         }
                     }
                 }
-                if (match_bitapScore(d + 1, loc, loc, pattern) > score_threshold)
+                if (MatchBitapScore(d + 1, loc, loc, pattern) > score_threshold)
                 {
                     // No hope for a (better) match at greater error levels.
                     break;
@@ -1944,7 +2014,7 @@ namespace DiffMatchPatch
          * @param pattern Pattern being sought.
          * @return Overall score for match (0.0 = good, 1.0 = bad).
          */
-        private double match_bitapScore(int e, int x, int loc, string pattern)
+        private double MatchBitapScore(int e, int x, int loc, string pattern)
         {
             float accuracy = (float)e / pattern.Length;
             int proximity = Math.Abs(loc - x);
@@ -1961,7 +2031,7 @@ namespace DiffMatchPatch
          * @param pattern The text to encode.
          * @return Hash of character locations.
          */
-        protected Dictionary<char, int> match_alphabet(string pattern)
+        protected Dictionary<char, int> MatchAlphabet(string pattern)
         {
             Dictionary<char, int> s = new Dictionary<char, int>();
             char[] char_pattern = pattern.ToCharArray();
@@ -1992,7 +2062,7 @@ namespace DiffMatchPatch
          * @param patch The patch to grow.
          * @param text Source text.
          */
-        protected void patch_addContext(Patch patch, string text)
+        protected void PatchAddContext(Patch patch, string text)
         {
             if (text.Length == 0)
             {
@@ -2146,7 +2216,7 @@ namespace DiffMatchPatch
                             // Time for a new patch.
                             if (patch.diffs.Count != 0)
                             {
-                                patch_addContext(patch, prepatch_text);
+                                PatchAddContext(patch, prepatch_text);
                                 patches.Add(patch);
                                 patch = new Patch();
                                 // Unlike Unidiff, our patch lists have a rolling context.
@@ -2173,7 +2243,7 @@ namespace DiffMatchPatch
             // Pick up the leftover patch if not empty.
             if (patch.diffs.Count != 0)
             {
-                patch_addContext(patch, prepatch_text);
+                PatchAddContext(patch, prepatch_text);
                 patches.Add(patch);
             }
 

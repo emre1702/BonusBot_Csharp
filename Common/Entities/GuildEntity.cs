@@ -1,4 +1,5 @@
 ﻿using BonusBot.Common.Attributes;
+using Common.Attributes;
 
 namespace BonusBot.Common.Entities
 {
@@ -16,12 +17,36 @@ namespace BonusBot.Common.Entities
         public ulong AudioCommandChannelId { get; set; }
         public ulong TagsManagerRoleId { get; set; }
         public ulong RolesRequestChannelId { get; set; }
-        public ulong GitHubWebHookMessageChannelId { get; set; }
         public ulong AudioInfoChannelId { get; set; }
         public string GitHubWebHookListenToUrl { get; set; }
         public string WelcomeMessage { get; set; }
         public string UserLeftMessage { get; set; }
         public bool UseRolesCommandSystem { get; set; }
+
+        [GitHubWebHookSettingProperty]
+        public ulong GitHubWebHookPushChannelId { get; set; }
+        [GitHubWebHookSettingProperty]
+        public ulong GitHubWebHookIssueOpenedChannelId { get; set; }
+        [GitHubWebHookSettingProperty]
+        public ulong GitHubWebHookIssueClosedChannelId { get; set; }
+        [GitHubWebHookSettingProperty]
+        public ulong GitHubWebHookIssueCommentChannelId { get; set; }
+        [GitHubWebHookSettingProperty]
+        public ulong GitHubWebHookIssueInitialCommentEditedChannelId { get; set; }
+        [GitHubWebHookSettingProperty]
+        public ulong GitHubWebHookIssueNeedTestingChannelId { get; set; }
+        [GitHubWebHookSettingProperty]
+        public ulong GitHubWebHookIssueHelpWantedChannelId { get; set; }
+        [GitHubWebHookSettingProperty]
+        public ulong GitHubWebHookErrorOutputChannelId { get; set; }
+        [GitHubWebHookSettingProperty]
+        public bool GitHubWebHookIssueNeedTestingDeleteAfterRemove { get; set; }
+        [GitHubWebHookSettingProperty]
+        public bool GitHubWebHookIssueHelpWantedDeleteAfterRemove { get; set; }
+        [GitHubWebHookSettingProperty]
+        public string GitHubWebHookIssueBugTitlePrefix { get; set; }
+        [GitHubWebHookSettingProperty]
+        public string GitHubWebHookIssueSuggestionTitlePrefix { get; set; }
 
         [NotConfigurableProperty]
         public uint LastPlayerVolume { get; set; }

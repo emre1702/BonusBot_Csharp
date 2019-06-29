@@ -14,7 +14,10 @@ using Victoria;
 using Victoria.Entities;
 using BonusBot.Common.Handlers;
 using BonusBot.WebHook;
-using System.Threading;
+using Common.Handlers;
+using WebHook.Entity;
+using WebHook;
+using System.Collections.Generic;
 
 namespace BonusBot.Core.Handlers
 {
@@ -63,6 +66,8 @@ namespace BonusBot.Core.Handlers
             socketClient.ReactionRemoved += OnReactionRemoved;
 
             commandService.CommandExecuted += OnCommandExecuted;
+
+            ModuleEventsHandler.GitHubWebHookSettingChanged += CreateGitHubListenerForGuild;
         }
 
         private Task OnPlayerUpdated(LavaPlayer player, LavaTrack track, TimeSpan position)
@@ -140,20 +145,49 @@ namespace BonusBot.Core.Handlers
         {
             var guildEntity = _databaseHandler.Get<GuildEntity>(guild.Id);
 
-            if (string.IsNullOrWhiteSpace(guildEntity.GitHubWebHookListenToUrl) || guildEntity.GitHubWebHookMessageChannelId == default)
+            if (string.IsNullOrWhiteSpace(guildEntity.GitHubWebHookListenToUrl))   // || guildEntity.GitHubWebHookMessageChannelId == default)
                 return;
 
-            var outputToChannel = guild.GetTextChannel(guildEntity.GitHubWebHookMessageChannelId);
-            if (outputToChannel == default)
-                return;
+            var settings = GetWebHookSettings(guild, guildEntity);
 
-            new GitHubListener(guildEntity.GitHubWebHookListenToUrl, outputToChannel, (msg, severity, ex) =>
+            new GitHubListener(guildEntity.GitHubWebHookListenToUrl, settings, (msg, severity, ex) =>
             {
                 if (ex != null)
-                    outputToChannel.SendMessageAsync($"WebHook [{severity.ToString()}]: {msg}:\n{ex}");
+                    settings.ErrorOutputChannel?.SendMessageAsync($"WebHook [{severity.ToString()}]: {msg}:\n{ex}");
                 else
-                    outputToChannel.SendMessageAsync($"WebHook [{severity.ToString()}]: {msg}");
+                    settings.ErrorOutputChannel?.SendMessageAsync($"WebHook [{severity.ToString()}]: {msg}");
             });
+        }
+
+        private GuildWebHookSettings GetWebHookSettings(SocketGuild guild, GuildEntity guildEntity)
+        {
+            return new GuildWebHookSettings
+            {
+                Guild = guild,
+
+                #nullable enable
+                OutputChannel = new Dictionary<PostType, ITextChannel?> {
+
+                    [PostType.Push] = guildEntity.GitHubWebHookPushChannelId != default ? guild.GetTextChannel(guildEntity.GitHubWebHookPushChannelId) : null,
+                    [PostType.IssueOpened] = guildEntity.GitHubWebHookIssueOpenedChannelId != default ? guild.GetTextChannel(guildEntity.GitHubWebHookIssueOpenedChannelId) : null,
+                    [PostType.IssueClosed] = guildEntity.GitHubWebHookIssueClosedChannelId != default ? guild.GetTextChannel(guildEntity.GitHubWebHookIssueClosedChannelId) : null,
+                    [PostType.IssueCommented] = guildEntity.GitHubWebHookIssueCommentChannelId != default ? guild.GetTextChannel(guildEntity.GitHubWebHookIssueCommentChannelId) : null,
+                    [PostType.IssueInitialCommentEdited] = guildEntity.GitHubWebHookIssueInitialCommentEditedChannelId != default
+                                                        ? guild.GetTextChannel(guildEntity.GitHubWebHookIssueInitialCommentEditedChannelId) : null,
+                    [PostType.IssueNeedTestingAdded] = guildEntity.GitHubWebHookIssueNeedTestingChannelId != default ? guild.GetTextChannel(guildEntity.GitHubWebHookIssueNeedTestingChannelId) : null,
+                    [PostType.IssueHelpWantedAdded] = guildEntity.GitHubWebHookIssueHelpWantedChannelId != default ? guild.GetTextChannel(guildEntity.GitHubWebHookIssueHelpWantedChannelId) : null,
+                },
+                #nullable restore
+
+                ErrorOutputChannel = guildEntity.GitHubWebHookErrorOutputChannelId != default ? guild.GetTextChannel(guildEntity.GitHubWebHookErrorOutputChannelId) : null,
+
+                DeleteNeedTestingAfterLabelRemove = guildEntity.GitHubWebHookIssueNeedTestingDeleteAfterRemove,
+                DeleteHelpWantedAfterLabelRemove = guildEntity.GitHubWebHookIssueHelpWantedDeleteAfterRemove,
+
+                BugIssueTitlePrefix = guildEntity.GitHubWebHookIssueBugTitlePrefix,
+                SuggestionIssueTitlePrefix = guildEntity.GitHubWebHookIssueSuggestionTitlePrefix,
+            };
+
         }
 
         private async Task OnUserJoined(SocketGuildUser user)
