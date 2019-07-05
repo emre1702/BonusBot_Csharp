@@ -30,31 +30,38 @@ namespace BonusBot.Core.Jobs
 
                 foreach (var userCase in cases)
                 {
-                    var guild = _client.GetGuild(userCase.GuildId);
-                    var guildDb = _database.Get<GuildEntity>(guild.Id);
-                    var user = guild.GetUser(userCase.UserId);
-
-                    switch (userCase.CaseType)
+                    try
                     {
-                        case CaseType.TempBan:
-                            await guild.RemoveBanAsync(user);
-                            break;
+                        var guild = _client.GetGuild(userCase.GuildId);
+                        var guildDb = _database.Get<GuildEntity>(guild.Id);
+                        var user = guild.GetUser(userCase.UserId);
 
-                        case CaseType.TempMute:
-                            var muteRole = guild.GetRole(guildDb.MuteRoleId);
-                            if (user != null)
-                                _rolesHandler.ChangeRolesToUnmute(user);
-                            break;
+                        switch (userCase.CaseType)
+                        {
+                            case CaseType.TempBan:
+                                await guild.RemoveBanAsync(userCase.UserId);
+                                break;
 
-                        case CaseType.TempBlock:
-                            var channel = guild.GetTextChannel(userCase.ChannelId);
-                            if (user != null)
-                                await channel.RemovePermissionOverwriteAsync(user);
-                            break;
+                            case CaseType.TempMute:
+                                var muteRole = guild.GetRole(guildDb.MuteRoleId);
+                                if (user != null)
+                                    _rolesHandler.ChangeRolesToUnmute(user);
+                                break;
+
+                            case CaseType.TempBlock:
+                                var channel = guild.GetTextChannel(userCase.ChannelId);
+                                if (user != null)
+                                    await channel.RemovePermissionOverwriteAsync(user);
+                                break;
+                        }
+
+                        //var modChannel = guild.GetTextChannel(guildDb.LogChannelId);
+                        //await modChannel?.SendMessageAsync("");
                     }
-
-                    //var modChannel = guild.GetTextChannel(guildDb.LogChannelId);
-                    //await modChannel?.SendMessageAsync("");
+                    catch
+                    {
+                        //ignored
+                    }
 
                     _database.Delete(userCase);
                 }
