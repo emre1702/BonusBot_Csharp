@@ -37,13 +37,13 @@ namespace BonusBot.Common.Handlers
             _botClient = botClient;
         }
 
-        public async void InitForGuild(SocketGuild guild)
+        public async void InitForGuild(SocketGuild guild, GuildEntity guildEntity)
         {
             if (_rolesUsedByGuild.ContainsKey(guild.Id))
                 _rolesUsedByGuild.Remove(guild.Id);
             var list = new HashSet<string>();
             _rolesUsedByGuild.Add(guild.Id, list);
-            var guildEntity = _databaseHandler.Get<GuildEntity>(guild.Id);
+
             foreach (var entry in _roleByEmojiName)
             {
                 ulong roleId = (ulong) entry.Value.GetValue(guildEntity);

@@ -186,7 +186,7 @@ namespace AdminAssembly
 {
     partial class AdminModule
     {
-        
+
     }
 }
 */

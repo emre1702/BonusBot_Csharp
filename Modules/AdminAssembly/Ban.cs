@@ -113,7 +113,7 @@ Please use with X as number:
 
         private async Task<IUser> GetBannedUser(string targetStr)
         {
-            IUser target = await GetMentionedUser(targetStr, null, true, false);
+            IUser target = await GetMentionedUser(targetStr, null, false, false);
             if (target != null)
                 return target;
 

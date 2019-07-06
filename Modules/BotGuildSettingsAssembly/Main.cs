@@ -41,7 +41,7 @@ namespace BotGuildSettingsAssembly
         protected override void AfterExecute(CommandInfo command)
         {
             _databaseHandler.Save(_guildEntity);
-            _roleReactionHandler.InitForGuild(Context.Guild);
+            _roleReactionHandler.InitForGuild(Context.Guild, _guildEntity);
             base.AfterExecute(command);
         }
 

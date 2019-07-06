@@ -18,6 +18,7 @@ using Common.Handlers;
 using WebHook.Entity;
 using WebHook;
 using System.Collections.Generic;
+using LiteDB;
 
 namespace BonusBot.Core.Handlers
 {
@@ -134,16 +135,24 @@ namespace BonusBot.Core.Handlers
                 ReconnectInterval = TimeSpan.FromSeconds(3)
             });
 
+            var collection = _databaseHandler.GetCollection<CaseEntity>();
             foreach (var guild in _socketClient.Guilds)
             {
-                _roleReactionHandler.InitForGuild(guild);
-                CreateGitHubListenerForGuild(guild);
+                var guildEntity = _databaseHandler.Get<GuildEntity>(guild.Id);
+                _roleReactionHandler.InitForGuild(guild, guildEntity);
+                CreateGitHubListenerForGuild(guild, guildEntity);
+                await CheckCaseEntities(guild, collection);
             }
         }
 
         private void CreateGitHubListenerForGuild(SocketGuild guild)
         {
             var guildEntity = _databaseHandler.Get<GuildEntity>(guild.Id);
+            CreateGitHubListenerForGuild(guild, guildEntity);
+        }
+
+        private void CreateGitHubListenerForGuild(SocketGuild guild, GuildEntity guildEntity)
+        {
 
             if (string.IsNullOrWhiteSpace(guildEntity.GitHubWebHookListenToUrl))   // || guildEntity.GitHubWebHookMessageChannelId == default)
                 return;
@@ -157,6 +166,29 @@ namespace BonusBot.Core.Handlers
                 else
                     settings.ErrorOutputChannel?.SendMessageAsync($"WebHook [{severity.ToString()}]: {msg}");
             });
+        }
+
+        private async Task CheckCaseEntities(SocketGuild guild, LiteCollection<CaseEntity> collection)
+        {
+            var caseEntites = collection.Find(entity => entity.GuildId == guild.Id);
+            foreach (var entity in caseEntites)
+            {
+                switch (entity.CaseType)
+                {
+                    case CaseType.Ban:
+                        try
+                        {
+                            var ban = await guild.GetBanAsync(entity.UserId);
+                            if (ban == null)
+                                throw new Exception();
+                        }
+                        catch
+                        {
+                            await guild.AddBanAsync(entity.UserId, 0, entity.Reason);
+                        }
+                        break;
+                }
+            }
         }
 
         private GuildWebHookSettings GetWebHookSettings(SocketGuild guild, GuildEntity guildEntity)
