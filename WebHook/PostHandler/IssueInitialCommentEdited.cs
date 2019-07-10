@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Discord;
 using WebHook.Entity.GitHub;
@@ -7,19 +8,17 @@ namespace WebHook.PostHandler
 {
     class IssueInitialCommentEdited
     {
-        public static EmbedBuilder Handle(Base o)
+        public static List<EmbedBuilder> Handle(Base o)
         {
-
-
             var builder = new EmbedBuilder()
                    .WithAuthor(o.Sender.Username, o.Sender.AvatarUrl, o.Sender.UserUrl)
                    .WithColor(195, 206, 26)
                    .WithTitle(o.Issue.Title)
                    .WithUrl(o.Issue.HtmlUrl)
-                   .WithDescription(GetBody(o))
+                   .WithDescription(Handler.SplitForEmbedDescription(GetBody(o)).First())
                    .WithFooter("Issue text changed");
 
-            return builder;
+            return new List<EmbedBuilder> { builder };
         }
 
         private static string GetBody(Base o)

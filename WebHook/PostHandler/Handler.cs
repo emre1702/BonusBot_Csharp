@@ -12,9 +12,11 @@ namespace WebHook.PostHandler
 {
     class Handler
     {
+        public const int MAX_DESCRIPTION_LENGTH = 2048;
+
         private readonly GuildWebHookSettings _settings;
         private readonly Action<string, LogSeverity, Exception> _logger;
-        private readonly Dictionary<PostType, Func<Base, EmbedBuilder>> _embedGetter = new Dictionary<PostType, Func<Base, EmbedBuilder>>
+        private readonly Dictionary<PostType, Func<Base, List<EmbedBuilder>>> _embedGetter = new Dictionary<PostType, Func<Base, List<EmbedBuilder>>>
         {
             [PostType.Push] = Push.Handle,
             [PostType.IssueClosed] = IssueClosed.Handle,
@@ -51,21 +53,27 @@ namespace WebHook.PostHandler
 
                 if (!_embedGetter.ContainsKey(postType))
                     return;
-                var embedBuilder = _embedGetter[postType](o);
+                var embedBuilders = _embedGetter[postType](o);
 
                 if (postType == PostType.IssueOpened)
                 {
-                    if (!string.IsNullOrEmpty(_settings.BugIssueTitlePrefix) && embedBuilder.Title.StartsWith(_settings.BugIssueTitlePrefix))
+                    foreach (var embedBuilder in embedBuilders)
                     {
-                        embedBuilder.Color = new Color(150, 0, 0);
-                    }
-                    else if (!string.IsNullOrEmpty(_settings.SuggestionIssueTitlePrefix) && embedBuilder.Title.StartsWith(_settings.SuggestionIssueTitlePrefix))
-                    {
-                        embedBuilder.Color = new Color(0, 0, 150);
+                        if (!string.IsNullOrEmpty(_settings.BugIssueTitlePrefix) && embedBuilder.Title.StartsWith(_settings.BugIssueTitlePrefix))
+                        {
+                            embedBuilder.Color = new Color(150, 0, 0);
+                        }
+                        else if (!string.IsNullOrEmpty(_settings.SuggestionIssueTitlePrefix) && embedBuilder.Title.StartsWith(_settings.SuggestionIssueTitlePrefix))
+                        {
+                            embedBuilder.Color = new Color(0, 0, 150);
+                        }
                     }
                 }
 
-                await _settings.OutputChannel[postType].SendMessageAsync(embed: embedBuilder.Build());
+                foreach (var embedBuilder in embedBuilders)
+                {
+                    await _settings.OutputChannel[postType].SendMessageAsync(embed: embedBuilder.Build());
+                }
             }
             catch (Exception ex)
             {
@@ -148,6 +156,12 @@ namespace WebHook.PostHandler
                 return PostType.Push;
 
             return PostType.Unknown;
+        }
+
+        public static IEnumerable<string> SplitForEmbedDescription(string str)
+        {
+            return Enumerable.Range(0, str.Length / MAX_DESCRIPTION_LENGTH)
+                             .Select(i => str.Substring(i * MAX_DESCRIPTION_LENGTH, MAX_DESCRIPTION_LENGTH));
         }
     }
 }
