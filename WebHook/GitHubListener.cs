@@ -22,6 +22,7 @@ namespace BonusBot.WebHook
         private readonly GuildWebHookSettings _settings;
         private readonly string _url;
         private readonly Handler _postHandler;
+        private bool stopped;
 
         public GitHubListener(string url, GuildWebHookSettings settings, Action<string, LogSeverity, Exception> logger)
         {
@@ -49,6 +50,7 @@ namespace BonusBot.WebHook
 
         public void Stop()
         {
+            stopped = true;
             _listener?.Close();
             _listener = null;
         }
@@ -82,6 +84,7 @@ namespace BonusBot.WebHook
                 }
                 catch (HttpListenerException)
                 {
+                    stopped = true;
                     _listener.Close();
                     _listener = null;
                     return;
@@ -115,6 +118,8 @@ namespace BonusBot.WebHook
             try
             {
                 if (_listener == null)
+                    return;
+                if (stopped)
                     return;
                 var context = _listener.EndGetContext(result);
                 var path = context.Request.Url.LocalPath;

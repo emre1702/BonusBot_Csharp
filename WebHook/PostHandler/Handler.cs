@@ -160,8 +160,17 @@ namespace WebHook.PostHandler
 
         public static IEnumerable<string> SplitForEmbedDescription(string str)
         {
-            return Enumerable.Range(0, str.Length / MAX_DESCRIPTION_LENGTH)
-                             .Select(i => str.Substring(i * MAX_DESCRIPTION_LENGTH, MAX_DESCRIPTION_LENGTH));
+            var chunkLength = MAX_DESCRIPTION_LENGTH;
+            if (String.IsNullOrEmpty(str)) throw new ArgumentException();
+            if (chunkLength < 1) throw new ArgumentException();
+
+            for (int i = 0; i < str.Length; i += chunkLength)
+            {
+                if (chunkLength + i > str.Length)
+                    chunkLength = str.Length - i;
+
+                yield return str.Substring(i, chunkLength);
+            }
         }
     }
 }
