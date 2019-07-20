@@ -90,9 +90,9 @@ namespace WebHook.PostHandler
                 return;
             }
 
-            if (postType == PostType.IssueNeedTestingRemoved && _settings.DeleteNeedTestingAfterLabelRemove && _settings.OutputChannel.ContainsKey(PostType.IssueNeedTestingRemoved))
+            if (postType == PostType.IssueNeedTestingRemoved && _settings.DeleteNeedTestingAfterLabelRemove && _settings.OutputChannel.ContainsKey(PostType.IssueNeedTestingAdded))
             {
-                var channel = _settings.OutputChannel[PostType.IssueNeedTestingRemoved];
+                var channel = _settings.OutputChannel[PostType.IssueNeedTestingAdded];
                 await RemoveLabelAddedOutput(o, channel);
                 return;
             }
@@ -117,6 +117,7 @@ namespace WebHook.PostHandler
             .FirstOrDefault();
             if (msgId == default)
                 return;
+            await channel.DeleteMessageAsync(msgId);
         }
 
         private PostType GetPostType(Base content)
