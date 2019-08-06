@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BonusBot.Common.Entities;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 
 namespace AdminAssembly
 {
@@ -16,11 +17,11 @@ namespace AdminAssembly
         [RequireUserPermission(GuildPermission.MuteMembers)]
         public async Task MuteMember(string targetMention, string time, [Remainder] string reason)
         {
-            var target = await GetMentionedUser(targetMention, "mute [@user] [time] [reason]");
-            if (target == null)
+            var targetSocketUser = await GetMentionedUser(targetMention, "mute [@user] [time] [reason]");
+            if (targetSocketUser == null)
                 return;
 
-            string muteId = $"{target.Id}-Mute";
+            string muteId = $"{targetSocketUser.Id}-Mute";
 
             var previousMute = _databaseHandler.Get<CaseEntity>(muteId);
             if (previousMute != null)
@@ -46,18 +47,18 @@ Please use with X as number:
 
             if (!dateTimeOffset.HasValue && !isPerma)   // unmute
             {
-                if (previousMute != null)
+                if (previousMute != null && (targetSocketUser is SocketGuildUser target))
                     _rolesHandler.ChangeRolesToUnmute(target);
-                await ReplyAsync($"Unmuted user {target.Username}.");
+                await ReplyAsync($"Unmuted user {targetSocketUser.Username}.");
             }
             else
             {
-                if (previousMute == null)
+                if (previousMute == null && (targetSocketUser is SocketGuildUser target))
                     _rolesHandler.ChangeRolesToMute(target);
                 var caseEntity = new CaseEntity
                 {
                     Id = muteId,
-                    UserId = target.Id,
+                    UserId = targetSocketUser.Id,
                     CaseType = isPerma ? CaseType.Mute : CaseType.TempMute,
                     CreatedOn = DateTimeOffset.Now,
                     GuildId = Context.Guild.Id,
@@ -67,7 +68,7 @@ Please use with X as number:
                 if (dateTimeOffset.HasValue)
                     caseEntity.ExpiresOn = dateTimeOffset.Value;
                 _databaseHandler.Save(caseEntity);
-                await ReplyAsync($"Mute saved for user {target.Username}. Use 'muteinfo [@user]' or 'info [@user]' for informations.");
+                await ReplyAsync($"Mute saved for user {targetSocketUser.Username}. Use 'muteinfo [@user]' or 'info [@user]' for informations.");
             }
         }
 

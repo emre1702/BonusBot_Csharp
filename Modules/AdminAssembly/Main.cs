@@ -27,13 +27,24 @@ namespace AdminAssembly
             base.BeforeExecute(command);
         }
 
-        private async Task<SocketGuildUser> GetMentionedUser(string mention, string usage, bool outputError = true, bool checkHistory = true)
+        private async Task<SocketUser> GetMentionedUser(string mention, string usage, bool outputError = true, bool checkHistory = true)
         {
+            if (Context.Message.MentionedUsers.Any())
+            {
+                var socketUser = Context.Message.MentionedUsers.First();
+                var guildUser = Context.Guild.GetUser(socketUser.Id);
+                if (guildUser != null)
+                    return guildUser;
+                else 
+                    return socketUser;
+            }
+
             if (!MentionUtils.TryParseUser(mention, out ulong userId))
             {
                 if (outputError)
                     await ReplyAsync($"Please mention (a) valid user with @: '{usage}'");
-                return null;
+                if (!ulong.TryParse(mention, out userId))
+                    return null;
             }
 
             var user = Context.Guild.GetUser(userId);
