@@ -200,7 +200,7 @@ namespace BonusBot.Common.Handlers
 
         private static void AddQueueInfo(EmbedBuilder builder, LavaQueue queue)
         {
-            string queueStr = queue.ToString();
+            string queueStr = queue?.ToString();
             builder.Fields[4].Value = string.IsNullOrEmpty(queueStr) ? "-" : queueStr;
         }
 

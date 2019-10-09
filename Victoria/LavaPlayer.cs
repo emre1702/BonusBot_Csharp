@@ -259,7 +259,6 @@ namespace Victoria
         {
             Status = PlayerStatus.Disconnected;
             Queue.Clear();
-            OnQueueChanged?.Invoke();
             Queue = null;
             CurrentTrack = null;
             GC.SuppressFinalize(this);

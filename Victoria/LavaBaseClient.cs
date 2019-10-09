@@ -134,8 +134,8 @@ namespace Victoria
             if (!_players.TryRemove(voiceChannel.GuildId, out LavaPlayer player))
                 return;
 
-            player.Status = PlayerStatus.Disconnected;
-            await voiceChannel.DisconnectAsync().ConfigureAwait(false);
+            await player.DisposeAsync();
+            await voiceChannel.DisconnectAsync();
             var destroyPayload = new DestroyPayload(voiceChannel.GuildId);
             await socketHelper.SendPayloadAsync(destroyPayload);
         }
