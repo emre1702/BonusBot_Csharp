@@ -258,6 +258,7 @@ namespace Victoria
         internal ValueTask DisposeAsync()
         {
             Status = PlayerStatus.Disconnected;
+            OnQueueChanged?.Invoke();
             Queue.Clear();
             Queue = null;
             CurrentTrack = null;
