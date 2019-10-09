@@ -57,7 +57,10 @@ namespace AudioAssembly
                 User = Context.User
             };
 
-            player.Queue.Enqueue(track);
+            if (player.Queue.Count > 0 || player.CurrentTrack != null)
+                player.Queue.Enqueue(track);
+            else
+                await player.PlayAsync(track);
             await ReplyAsync($"{track.ToString()} has been queued.");
         }
 
