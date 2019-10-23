@@ -47,10 +47,16 @@ namespace AudioAssembly.SearchPlay
 
         private async Task HandleSearch(SearchResult search, int amount)
         {
-            if (search.LoadType == LoadType.NoMatches ||
-                search.LoadType == LoadType.LoadFailed)
+            if (search.LoadType == LoadType.LoadFailed)
             {
-                await ReplyAsync("Nothing found.");
+                await ReplyAsync("Load failed. The url could be wrong or maybe LavaLink needs an update.");
+                return;
+            }
+
+            if (search.LoadType == LoadType.NoMatches)
+            {
+                await ReplyAsync("Nothing found");
+                return;
             }
 
             await ReplyAsync($"Found amount: {Math.Min(search.Tracks.Count(), amount)}");
