@@ -15,15 +15,25 @@ namespace AudioAssembly
         [Alias("yt", "youtube")]
         public async Task PlayAsync([Remainder] string query)
         {
+            int playlistInUrlIndex = query.IndexOf("&list=");
+            if (playlistInUrlIndex >= 0)
+            {
+                query = query.Substring(0, playlistInUrlIndex);
+            }
             var search = await _lavaRestClient.SearchYouTubeAsync(query);
-            if (search.LoadType == LoadType.NoMatches ||
-                search.LoadType == LoadType.LoadFailed)
+            if (search.LoadType == LoadType.LoadFailed)
+            {
+                await ReplyAsync("Load failed. The url could be wrong or maybe LavaLink needs an update.");
+                return;
+            }
+
+            if (search.LoadType == LoadType.NoMatches)
             {
                 await ReplyAsync("Nothing found");
                 return;
             }
 
-            var audio = GetTrack(query, search);
+            var audio = search.Tracks.First();
             var track = new AudioTrack
             {
                 Audio = audio,
@@ -40,15 +50,25 @@ namespace AudioAssembly
         [Alias("ytqueue", "youtubequeue")]
         public async Task QueueAsync([Remainder] string query)
         {
+            int playlistInUrlIndex = query.IndexOf("&list=");
+            if (playlistInUrlIndex >= 0)
+            {
+                query = query.Substring(0, playlistInUrlIndex);
+            }
             var search = await _lavaRestClient.SearchYouTubeAsync(query);
-            if (search.LoadType == LoadType.NoMatches ||
-                search.LoadType == LoadType.LoadFailed)
+            if (search.LoadType == LoadType.LoadFailed)
+            {
+                await ReplyAsync("Load failed. The url could be wrong or maybe LavaLink needs an update.");
+                return;
+            }
+
+            if (search.LoadType == LoadType.NoMatches)
             {
                 await ReplyAsync("Nothing found");
                 return;
             }
 
-            var audio = GetTrack(query, search);
+            var audio = search.Tracks.First();
             var track = new AudioTrack
             {
                 Audio = audio,
@@ -64,28 +84,6 @@ namespace AudioAssembly
             await ReplyAsync($"{track.ToString()} has been queued.");
         }
 
-        private LavaTrack GetTrack(string query, SearchResult search)
-        {
-            if (search.LoadType == LoadType.PlaylistLoaded)
-            {
-                int index = 0;
-                int indexIndex = query.LastIndexOf("index=");
-                if (indexIndex >= 0)
-                {
-                    string indexStr = query.Substring(indexIndex + "index=".Length);
-                    if (int.TryParse(indexStr, out int theIndex))
-                    {
-                        index = theIndex;
-                    }
-                }
-                index = Math.Min(index - 1, search.Tracks.Count());
-                return search.Tracks.ElementAt(index);
-            }
-            else
-            {
-                return search.Tracks.First();
-            }
-        } 
 
         [Command("resume")]
         [Alias("unpause")]
