@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Discord.WebSocket;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace TDSConnector
+namespace TDSConnectorServerAssembly
 {
     public class Program
     {
-        public static void Main()
+        #nullable disable
+        public static DiscordSocketClient DiscordClient { get; set; }
+        #nullable restore
+
+        public static void Main() 
         {
-            CreateHostBuilder().Build().Run();
+            CreateHostBuilder().Build().RunAsync();
         }
 
         // Additional configuration is required to successfully run gRPC on macOS.
