@@ -1,5 +1,6 @@
 ﻿using Discord.WebSocket;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace TDSConnectorServerAssembly
@@ -22,6 +23,10 @@ namespace TDSConnectorServerAssembly
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureAppConfiguration((hostingContext, config) => 
+                {
+                    config.AddJsonFile("TDSConnectorServerSettings.json", optional: false, reloadOnChange: true);
                 });
     }
 }
