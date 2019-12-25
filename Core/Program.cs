@@ -73,7 +73,7 @@ namespace BonusBot.Core
             var settingsHandler = _provider.GetRequiredService<SettingsHandler>();
 
             var botToken = settingsHandler.Get<string>(SettingsDefault.Token);
-            ConsoleHelper.Log(LogSeverity.Info, "Core", "Using token for bot: " + botToken);
+            ConsoleHelper.Log(LogSeverity.Debug, "Core", "Using token for bot: " + botToken);
             await socketClient.LoginAsync(TokenType.Bot, botToken);
             await socketClient.StartAsync();
 
