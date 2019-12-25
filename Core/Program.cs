@@ -71,7 +71,10 @@ namespace BonusBot.Core
 
             var socketClient = _provider.GetRequiredService<DiscordSocketClient>();
             var settingsHandler = _provider.GetRequiredService<SettingsHandler>();
-            await socketClient.LoginAsync(TokenType.Bot, settingsHandler.Get<string>(SettingsDefault.Token));
+
+            var botToken = settingsHandler.Get<string>(SettingsDefault.Token);
+            ConsoleHelper.Log(LogSeverity.Info, "Core", "Using token for bot: " + botToken);
+            await socketClient.LoginAsync(TokenType.Bot, botToken);
             await socketClient.StartAsync();
 
             _provider.GetRequiredService<EventsHandler>();
