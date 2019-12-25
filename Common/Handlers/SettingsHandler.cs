@@ -24,7 +24,7 @@ namespace BonusBot.Common.Handlers
                         result = true;
                         loadSuccessful = true;
                     } 
-                    else if (value == "0" || value.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+                    else if (value == "0" || value.Equals("false", StringComparison.CurrentCultureIgnoreCase))
                     {
                         result = false;
                         loadSuccessful = true;
