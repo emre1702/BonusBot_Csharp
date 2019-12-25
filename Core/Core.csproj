@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.26.0" />
     <PackageReference Include="InfluxDB.Collector" Version="1.1.1-dev-10109" />
   </ItemGroup>
 

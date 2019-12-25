@@ -11,6 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", 
 		{C5A8DD40-8361-4867-A16E-6D38774CA652} = {C5A8DD40-8361-4867-A16E-6D38774CA652}
 		{94A1D783-8D81-4EEE-829D-932E9FE6FC7E} = {94A1D783-8D81-4EEE-829D-932E9FE6FC7E}
 		{A462668B-D4DD-46E0-862A-7FC47CD49EB6} = {A462668B-D4DD-46E0-862A-7FC47CD49EB6}
+		{B996979C-AD48-4B8B-A488-A2E2E1351112} = {B996979C-AD48-4B8B-A488-A2E2E1351112}
 		{3BE16DBC-C9FB-457B-84BE-5CEBF6ED18E2} = {3BE16DBC-C9FB-457B-84BE-5CEBF6ED18E2}
 		{0DFB48C5-F1D2-4A81-9502-CD7802C1D588} = {0DFB48C5-F1D2-4A81-9502-CD7802C1D588}
 		{95363EE7-26CC-47B6-9668-90696D27EDD9} = {95363EE7-26CC-47B6-9668-90696D27EDD9}
@@ -20,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		Core.deps.json = Core.deps.json
 		nuget.config = nuget.config
 		README.md = README.md
 	EndProjectSection
@@ -42,7 +44,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdminAssembly", "Modules\Ad
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UtilityAssembly", "Modules\UtilityAssembly\UtilityAssembly.csproj", "{3BE16DBC-C9FB-457B-84BE-5CEBF6ED18E2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TDSConnector_Server", "Modules\TDSConnector_Server\TDSConnector_Server.csproj", "{B996979C-AD48-4B8B-A488-A2E2E1351112}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TDSConnectorServerAssembly", "Modules\TDSConnectorServerAssembly\TDSConnectorServerAssembly.csproj", "{B996979C-AD48-4B8B-A488-A2E2E1351112}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

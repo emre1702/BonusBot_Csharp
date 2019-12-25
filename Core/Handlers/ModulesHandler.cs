@@ -9,6 +9,8 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BonusBot.Core.Handlers
 {
@@ -29,7 +31,7 @@ namespace BonusBot.Core.Handlers
 
         private void FetchExternalAssemblies()
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Modules");
+            var path = Directory.GetCurrentDirectory();         // Path.Combine(Directory.GetCurrentDirectory(), "Modules");
 
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
@@ -96,8 +98,18 @@ namespace BonusBot.Core.Handlers
             foreach (var context in _contexts.Values)
             {
                 var addModule = await _commandService.AddModulesAsync(context.Assembly, _provider);
-                context.Module = addModule.FirstOrDefault();
-                _contexts.TryUpdate(context.Name, context, context);
+                var theModule = addModule.FirstOrDefault();
+                if (theModule is null)
+                {
+                    context.Assembly.EntryPoint.Invoke(null, null);
+                    var programClass = context.Assembly.GetTypes().FirstOrDefault(t => t.Name == "Program");
+                    programClass?.GetProperty("DiscordClient")?.SetValue(null, _provider.GetRequiredService<DiscordSocketClient>());
+                }
+                else
+                {
+                    context.Module = addModule.FirstOrDefault();
+                    _contexts.TryUpdate(context.Name, context, context);
+                }
             }
         }
     }

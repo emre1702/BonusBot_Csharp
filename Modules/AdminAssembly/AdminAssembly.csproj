@@ -2,12 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <OutDir>..\..\Core\bin\Debug\netcoreapp3.1\Modules\</OutDir>
+    <OutDir>..\..\Core\bin\Debug\netcoreapp3.1\</OutDir>
     <RepositoryUrl />
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath></OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
