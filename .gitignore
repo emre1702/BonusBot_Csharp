@@ -331,3 +331,5 @@ ASALocalRun/
 .mfractor/
 
 *.db
+build
+/Core.dll.config
