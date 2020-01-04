@@ -1,0 +1,17 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TDSAssembly";
+
+service BBCommand {
+  rpc UsedCommand (UsedCommandRequest) returns (UsedCommandReply);
+}
+
+message UsedCommandRequest {
+    uint64 userId = 1;
+    string command = 2;
+
+}
+
+message UsedCommandReply {
+    string message = 1;
+}
