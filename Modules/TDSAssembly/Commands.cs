@@ -11,9 +11,10 @@ namespace TDSAssembly
         {
             try
             {
+                var context = (SocketCommandContext)Context;
                 var reply = await _connectorClient.UsedCommandAsync(new UsedCommandRequest
                 {
-                    UserId = Context.User.Id,
+                    UserId = context.User.Id,
                     Command = "confirmtds"
                 });
 
