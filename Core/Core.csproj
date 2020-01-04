@@ -3,15 +3,17 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore" Version="2.26.0" />
     <PackageReference Include="InfluxDB.Collector" Version="1.1.1-dev-10109" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Modules\TDSAssembly\TDSAssembly.csproj" />
+    <ProjectReference Include="..\Modules\TDSConnectorServerAssembly\TDSConnectorServerAssembly.csproj" />
     <ProjectReference Include="..\WebHook\WebHook.csproj" />
   </ItemGroup>
 
