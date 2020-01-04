@@ -262,22 +262,25 @@ namespace BonusBot.Core.Handlers
 
         private async Task OnMessage(SocketMessage socketMessage)
         {
-            if (socketMessage.Author.IsBot || socketMessage.Author.IsWebhook ||
-                socketMessage.Channel is IPrivateChannel)
+            if (socketMessage.Author.IsBot || socketMessage.Author.IsWebhook)
                 return;
 
             if (!(socketMessage is SocketUserMessage message))
                 return;
 
-            var guildId = message.Channel.CastTo<SocketGuildChannel>().Guild.Id;
-            if (await HandleTag(message.Content, guildId, message.Channel))
-                return;
+            var argPos = 1;
+            if (!(message.Channel is IPrivateChannel))
+            {
+                var guildId = message.Channel.CastTo<SocketGuildChannel>().Guild.Id;
+                if (await HandleTag(message.Content, guildId, message.Channel))
+                    return;
 
-            var guild = _databaseHandler.Get<GuildEntity>(guildId);
+                var guild = _databaseHandler.Get<GuildEntity>(guildId);
 
-            var argPos = 0;
-            if (!message.HasCharPrefix(guild.Prefix, ref argPos) && !message.HasMentionPrefix(_socketClient.CurrentUser, ref argPos))
-                return;
+                argPos = 0;
+                if (!message.HasCharPrefix(guild.Prefix, ref argPos) && !message.HasMentionPrefix(_socketClient.CurrentUser, ref argPos))
+                    return;
+            }            
 
             var context = new CustomContext(_socketClient, message);
             await _commandService.ExecuteAsync(context, argPos, _serviceProvider, MultiMatchHandling.Best);
