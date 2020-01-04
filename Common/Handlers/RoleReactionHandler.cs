@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using BonusBot.Common.Entities;
 using BonusBot.Common.Handlers;
+using BonusBot.Common.Helpers;
 using BonusBot.Common.Interfaces;
 using Discord;
 using Discord.Rest;
@@ -20,13 +21,19 @@ namespace BonusBot.Common.Handlers
 
         private readonly Dictionary<string, PropertyInfo> _roleByEmojiName = new Dictionary<string, PropertyInfo>
         {
+            ["👋"] = typeof(GuildEntity).GetProperty("MemberRoleId"),
             ["🇩🇪"] = typeof(GuildEntity).GetProperty("GermanRoleId"),
-            ["🇹🇷"] = typeof(GuildEntity).GetProperty("TurkishRoleId")
+            ["🇹🇷"] = typeof(GuildEntity).GetProperty("TurkishRoleId"),
+            ["📝"] = typeof(GuildEntity).GetProperty("DevFeedRoleId"),
+            ["\U0001f9e0"] = typeof(GuildEntity).GetProperty("TesterRoleId"),
         };
         private readonly Dictionary<string, Emoji> _emojiByEmojiName = new Dictionary<string, Emoji>
         {
+            ["👋"] = new Emoji("\ud83d\udc4b"),
             ["🇩🇪"] = new Emoji("\ud83c\udde9\ud83c\uddea"),
-            ["🇹🇷"] = new Emoji("\ud83c\uddf9\ud83c\uddf7")
+            ["🇹🇷"] = new Emoji("\ud83c\uddf9\ud83c\uddf7"),
+            ["📝"] = new Emoji("\ud83d\udcdd"),
+            ["\U0001f9e0"] = new Emoji("\uD83E\uDDE0")
         };
         private readonly Dictionary<ulong, HashSet<string>> _rolesUsedByGuild = new Dictionary<ulong, HashSet<string>>();
 
@@ -62,7 +69,7 @@ namespace BonusBot.Common.Handlers
                     return;
                 var pinnedMessages = await rolesChannel.GetPinnedMessagesAsync();
                 if (pinnedMessages.Count == 0 || !pinnedMessages.Any(m => m.Author.Id == _botClient.CurrentUser.Id))
-                    await CreateRoleReactionMessage(rolesChannel);
+                    await CreateRoleReactionMessage(rolesChannel, guildEntity);
                 else
                 {
                     await EditRoleReactionMessage(rolesChannel.Guild.Id, pinnedMessages.Last() as RestUserMessage);
@@ -119,9 +126,10 @@ namespace BonusBot.Common.Handlers
             await user.RemoveRoleAsync(role);
         }
 
-        private async Task CreateRoleReactionMessage(SocketTextChannel rolesChannel)
+        private async Task CreateRoleReactionMessage(SocketTextChannel rolesChannel, GuildEntity guild)
         {
-            var message = await rolesChannel.SendMessageAsync("Choose a reaction to get or remove the role.");
+            var infoText = !string.IsNullOrEmpty(guild.RolesRequestInfoText) ? guild.RolesRequestInfoText.Replace() : "Choose a reaction to get or remove the role.";
+            var message = await rolesChannel.SendMessageAsync(infoText);
             var emojis = _rolesUsedByGuild[rolesChannel.Guild.Id]
                 .Select(emojiStr => _emojiByEmojiName[emojiStr])
                 .ToArray();

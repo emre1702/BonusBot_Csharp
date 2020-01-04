@@ -11,8 +11,11 @@ namespace BonusBot.Common.Entities
         public ulong LogChannelId { get; set; }
         public ulong WelcomeChannelId { get; set; }
         public ulong UserLeftLogChannelId { get; set; }
+        public ulong MemberRoleId { get; set; }
         public ulong GermanRoleId { get; set; }
         public ulong TurkishRoleId { get; set; }
+        public ulong DevFeedRoleId { get; set; }
+        public ulong TesterRoleId { get; set; }
         public ulong AudioBotUserRoleId { get; set; }
         public ulong AudioCommandChannelId { get; set; }
         public ulong TagsManagerRoleId { get; set; }
@@ -22,6 +25,7 @@ namespace BonusBot.Common.Entities
         public string WelcomeMessage { get; set; }
         public string UserLeftMessage { get; set; }
         public bool UseRolesCommandSystem { get; set; }
+        public string RolesRequestInfoText { get; set; }
 
         [GitHubWebHookSettingProperty]
         public ulong GitHubWebHookPushChannelId { get; set; }
