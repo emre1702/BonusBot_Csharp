@@ -11,6 +11,7 @@ using LiteDB;
 
 namespace TagAssembly
 {
+    [RequireContext(ContextType.Guild)]
     [Group("Tag")]
     public sealed class TagModule : CommandBase
     {
