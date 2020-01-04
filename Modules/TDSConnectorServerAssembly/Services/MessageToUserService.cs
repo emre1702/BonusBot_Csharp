@@ -20,7 +20,7 @@ namespace TDSConnectorServerAssembly
                 if (guild is null)
                     return new MessageToUserRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist." };
 
-                SocketGuildUser? target = GetUser(guild, request.UserIdOrDiscriminiator);
+                SocketGuildUser? target = guild.GetUser(request.UserId);
 
                 if (target is null)
                     return new MessageToUserRequestReply { ErrorMessage = null };
@@ -49,7 +49,7 @@ namespace TDSConnectorServerAssembly
                 if (guild is null)
                     return new MessageToUserRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist." };
 
-                SocketGuildUser? target = GetUser(guild, request.UserIdOrDiscriminiator);
+                SocketGuildUser? target = guild.GetUser(request.UserId);
                 if (target is null)
                     return new MessageToUserRequestReply { ErrorMessage = null };
 
@@ -80,23 +80,6 @@ namespace TDSConnectorServerAssembly
                 {
                     ErrorMessage = ex.GetBaseException().Message
                 };
-            }
-        }
-
-        private static SocketGuildUser? GetUser(SocketGuild guild, string userIdOrDiscriminiator)
-        {
-            try
-            {
-                if (ulong.TryParse(userIdOrDiscriminiator, out ulong userId))
-                {
-                    return guild.GetUser(userId);
-                }
-                
-                return guild.Users.FirstOrDefault(u => !u.IsBot && u.Discriminator.Equals(userIdOrDiscriminiator, StringComparison.InvariantCultureIgnoreCase));
-            } 
-            catch
-            {
-                return null;
             }
         }
     }
