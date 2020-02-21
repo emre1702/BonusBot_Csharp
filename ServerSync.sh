@@ -19,7 +19,7 @@ SEPERATOR='==============================='
 cd /cygdrive/b/Users/EmreKara/Desktop/Tools/GitHub/BonusBot/build
 
 echo -e "${SEPERATOR}"
-echo -e "Update ${LIGHTBLUE}TDS ${NOCOLOR}runtimes ..."
-rsync -hmrtvzP --chmod=Du=rwx,Dgo=rw,Fu=rw,Fog=r --usermap=*:bonusbot --timeout=60 --delete --exclude="*.config" --exclude="*.db" -e "B:\cygwin64\bin\ssh.exe -p 55555 -i C:/Users/emre1/.ssh/mvs-root" . root@185.101.94.212:/home/bonusbot
+echo -e "Update ${LIGHTBLUE}Bonusbot ${NOCOLOR}..."
+rsync -hmrtvzP --chmod=Du=rwx,Dgo=rw,Fu=rw,Fog=r --chown=bonusbot:bonusbot --timeout=60 --delete --exclude="*.config" --exclude="*.db" -e "B:\cygwin64\bin\ssh.exe -p 55555 -i C:/Users/emre1/.ssh/mvs-root" . root@185.101.94.212:/home/bonusbot
 
 cmd /k
