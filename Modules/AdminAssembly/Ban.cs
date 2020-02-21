@@ -67,8 +67,10 @@ Please use with X as number:
             if (dateTimeOffset.HasValue || isPerma)   // not unban
             {
                 var dmChannel = await target.GetOrCreateDMChannelAsync();
-                await dmChannel?.SendMessageAsync($"You've been banned in TDS-V Discord server by {Context.User.Username}. Reason: {reason}");
-                await dmChannel?.SendMessageAsync($"Expires: {(isPerma ? "never" : dateTimeOffset.Value.ToString())}");
+                await dmChannel?.SendMessageAsync(
+ @$"You've been banned in {Context.Guild.Name} Discord server by {Context.User.Username}. 
+Reason: {reason}
+Expires: {(isPerma ? "never" : dateTimeOffset.Value.ToString())}");
 
                 await Context.Guild.AddBanAsync(target, 0, reason);
                 var caseEntity = new CaseEntity
@@ -90,7 +92,7 @@ Please use with X as number:
             {
                 await ReplyAsync($"The user {target.Username} got unbanned.");
                 var dmChannel = await target.GetOrCreateDMChannelAsync();
-                dmChannel?.SendMessageAsync($"You got unbanned in TDS-V Discord server by {Context.User.Username}. Reason: {reason}");
+                dmChannel?.SendMessageAsync($"You got unbanned in {Context.Guild.Name} Discord server by {Context.User.Username}. Reason: {reason}");
             }
 
         }

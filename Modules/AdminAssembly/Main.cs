@@ -41,7 +41,7 @@ namespace AdminAssembly
 
             if (!MentionUtils.TryParseUser(mention, out ulong userId))
             {
-                if (outputError)
+                if (outputError && usage is { })
                     await ReplyAsync($"Please mention (a) valid user with @: '{usage}'");
                 if (!ulong.TryParse(mention, out userId))
                     return null;
@@ -50,7 +50,7 @@ namespace AdminAssembly
             var user = Context.Guild.GetUser(userId);
             if (user == null)
             {
-                if (outputError)
+                if (outputError && usage is { })
                     await ReplyAsync($"The user doesn't exist: '{usage}'");
                 return null;
             }

@@ -53,6 +53,10 @@ namespace BonusBot.Core.Jobs
                                 if (user != null)
                                     await channel.RemovePermissionOverwriteAsync(user);
                                 break;
+
+                            case CaseType.TempRoleBan:
+                                // Do nothing?
+                                break;
                         }
 
                         //var modChannel = guild.GetTextChannel(guildDb.LogChannelId);

@@ -112,7 +112,8 @@ namespace BonusBot.Common.Helpers
         {
             return caseEntity.CaseType == CaseType.TempBan
                    || caseEntity.CaseType == CaseType.TempMute
-                   || caseEntity.CaseType == CaseType.TempBlock;
+                   || caseEntity.CaseType == CaseType.TempBlock
+                   || caseEntity.CaseType == CaseType.TempRoleBan;
         }
 
         public static double ConvertToMb(this long value)

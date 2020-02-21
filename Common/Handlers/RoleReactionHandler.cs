@@ -91,6 +91,11 @@ namespace BonusBot.Common.Handlers
             var user = reaction.User.GetValueOrDefault();
             if (user == null || !(user is SocketGuildUser socketUser))
                 return;
+
+            string rolebanId = $"{user.Id}-{roleId}-RoleBan";
+            var roleBan = _databaseHandler.Get<CaseEntity>(rolebanId);
+            if (roleBan is { }) 
+                return;
             await GiveRole(socketUser, roleId);
         }
 

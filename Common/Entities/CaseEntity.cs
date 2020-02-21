@@ -47,6 +47,8 @@ namespace BonusBot.Common.Entities
         Block,
         TempBan,
         TempMute,
-        TempBlock
+        TempBlock,
+        RoleBan,
+        TempRoleBan
     }
 }
