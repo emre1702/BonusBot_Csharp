@@ -35,6 +35,8 @@ namespace TagAssembly
         [TagManageProviso]
         public Task Add(string name, [Remainder] string content)
         {
+            (name, content) = UseQuotationMarksForFirstText(name, content);
+
             var prevTag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower());
             if (prevTag != null)
                 return ReplyAsync($"Tag `{prevTag.Id}` already exists. Try another name?");
@@ -56,8 +58,10 @@ namespace TagAssembly
         [Command("Remove"), Alias("Delete", "Del")]
         [Priority(1)]
         [TagManageProviso]
-        public Task Remove(string name)
+        public Task Remove([Remainder] string name)
         {
+            name = RemoveQuotationMarksAtStartAndEnd(name);
+
             var tag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower());
 
             if (tag is null)
@@ -71,6 +75,8 @@ namespace TagAssembly
         [Priority(1)]
         public async Task<RuntimeResult> Info(string name)
         {
+            name = RemoveQuotationMarksAtStartAndEnd(name);
+
             var tag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower());
 
             if (tag is null)
