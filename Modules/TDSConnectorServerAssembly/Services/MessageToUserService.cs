@@ -18,7 +18,7 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new MessageToUserRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist." };
+                    return new MessageToUserRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", ErrorStackTrace = Environment.StackTrace };
 
                 SocketGuildUser? target = guild.GetUser(request.UserId);
 
@@ -34,7 +34,8 @@ namespace TDSConnectorServerAssembly
             {
                 return new MessageToUserRequestReply
                 {
-                    ErrorMessage = ex.GetBaseException().Message
+                    ErrorMessage = ex.GetBaseException().Message,
+                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace
                 };
             }
         }
@@ -47,7 +48,7 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new MessageToUserRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist." };
+                    return new MessageToUserRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", ErrorStackTrace = Environment.StackTrace };
 
                 SocketGuildUser? target = guild.GetUser(request.UserId);
                 if (target is null)
@@ -78,7 +79,8 @@ namespace TDSConnectorServerAssembly
             {
                 return new MessageToUserRequestReply
                 {
-                    ErrorMessage = ex.GetBaseException().Message
+                    ErrorMessage = ex.GetBaseException().Message,
+                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace
                 };
             }
         }

@@ -17,10 +17,10 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new MessageToChannelRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist." };
+                    return new MessageToChannelRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", ErrorStackTrace = Environment.StackTrace };
 
                 if (!(guild.GetChannel(request.ChannelId) is SocketTextChannel channel))
-                    return new MessageToChannelRequestReply { ErrorMessage = $"The channel with Id {request.ChannelId} does not exist." };
+                    return new MessageToChannelRequestReply { ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", ErrorStackTrace = Environment.StackTrace };
 
                 await channel.SendMessageAsync(request.Text);
 
@@ -30,7 +30,8 @@ namespace TDSConnectorServerAssembly
             {
                 return new MessageToChannelRequestReply
                 {
-                    ErrorMessage = ex.GetBaseException().Message
+                    ErrorMessage = ex.GetBaseException().Message,
+                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace
                 };
             }
         }
@@ -43,10 +44,10 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new MessageToChannelRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist." };
+                    return new MessageToChannelRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", ErrorStackTrace = Environment.StackTrace };
 
                 if (!(guild.GetChannel(request.ChannelId) is SocketTextChannel channel))
-                    return new MessageToChannelRequestReply { ErrorMessage = $"The channel with Id {request.ChannelId} does not exist." };
+                    return new MessageToChannelRequestReply { ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", ErrorStackTrace = Environment.StackTrace };
 
                 var embedBuilder = new EmbedBuilder();
 
@@ -73,7 +74,8 @@ namespace TDSConnectorServerAssembly
             {
                 return new MessageToChannelRequestReply
                 {
-                    ErrorMessage = ex.GetBaseException().Message
+                    ErrorMessage = ex.GetBaseException().Message,
+                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace
                 };
             }
         }
