@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -43,13 +44,17 @@ namespace TDSConnectorServerAssembly
                         .WithFooter(request.Version)
                         .WithFields(new List<EmbedFieldBuilder>
                         {
-                            new EmbedFieldBuilder { IsInline = true, Name = "Player online:", Value = request.PlayerAmountOnline },
+                            new EmbedFieldBuilder { IsInline = true, Name = "IP", Value = request.ServerAddress },
+                            new EmbedFieldBuilder { IsInline = true, Name = "Port", Value = request.ServerPort },
+                            new EmbedFieldBuilder { IsInline = true, Name = "Players online:", Value = request.PlayerAmountOnline },
+                            new EmbedFieldBuilder { IsInline = true, Name = "Peak today:", Value = request.PlayerPeakToday },
                             new EmbedFieldBuilder { IsInline = true, Name = "In arena:", Value = request.PlayerAmountInArena },
                             new EmbedFieldBuilder { IsInline = true, Name = "In gang lobby", Value = request.PlayerAmountInGangLobby },
                             new EmbedFieldBuilder { IsInline = true, Name = "In custom lobby:", Value = request.PlayerAmountInCustomLobby },
                             new EmbedFieldBuilder { IsInline = true, Name = "In main menu:", Value = request.PlayerAmountInMainMenu },
-                            new EmbedFieldBuilder { IsInline = false, Name = "URL:", Value = $"rage://v/connect?ip={request.ServerAddress}:{request.ServerPort}"}
-                        });
+                            new EmbedFieldBuilder { IsInline = false, Name = "URL:", Value = $"rage://v/connect?ip={request.ServerAddress}:{request.ServerPort}"},
+                            new EmbedFieldBuilder { IsInline = true, Name = "Online since", Value = request.OnlineSince },
+                        });;
 
                 var msgList = await channel.GetMessagesAsync(1).FlattenAsync();
                 var msg = msgList.FirstOrDefault();
@@ -79,7 +84,7 @@ namespace TDSConnectorServerAssembly
                         await message.ModifyAsync(properties => 
                         {
                             properties.Embed = null;
-                            properties.Content = "Last online: " + datetimeNow.ToString();
+                            properties.Content = "Last online: " + GetUniversalDateTimeString(datetimeNow);
                         });
                     }
                 };
@@ -97,6 +102,12 @@ namespace TDSConnectorServerAssembly
                 };
             }
            
+        }
+
+        private string GetUniversalDateTimeString(DateTimeOffset dateTime)
+        {
+            var enUsCulture = CultureInfo.CreateSpecificCulture("en-US");
+            return dateTime.ToString("f", enUsCulture) + " +00:00";
         }
     }
 }
