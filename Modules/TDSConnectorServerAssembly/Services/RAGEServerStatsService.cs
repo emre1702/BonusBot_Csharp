@@ -86,7 +86,7 @@ namespace TDSConnectorServerAssembly
                 _checkServerOfflineTimer.Start();
 
 
-                return new RAGEServerStatsRequestReply { ErrorMessage = null };
+                return new RAGEServerStatsRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
             } 
             catch (Exception ex)
             {

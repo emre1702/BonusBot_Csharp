@@ -23,12 +23,12 @@ namespace TDSConnectorServerAssembly
                 SocketGuildUser? target = guild.GetUser(request.UserId);
 
                 if (target is null)
-                    return new MessageToUserRequestReply { ErrorMessage = null };
+                    return new MessageToUserRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
 
                 var privateChat = await target.GetOrCreateDMChannelAsync();
                 await privateChat.SendMessageAsync(request.Text);
 
-                return new MessageToUserRequestReply { ErrorMessage = null };
+                return new MessageToUserRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
             }
             catch (Exception ex)
             {
@@ -52,7 +52,7 @@ namespace TDSConnectorServerAssembly
 
                 SocketGuildUser? target = guild.GetUser(request.UserId);
                 if (target is null)
-                    return new MessageToUserRequestReply { ErrorMessage = null };
+                    return new MessageToUserRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
 
                 var embedBuilder = new EmbedBuilder();
 
@@ -73,7 +73,7 @@ namespace TDSConnectorServerAssembly
                 var privateChat = await target.GetOrCreateDMChannelAsync();
                 await privateChat.SendMessageAsync(embed: embedBuilder.Build());
 
-                return new MessageToUserRequestReply { ErrorMessage = null };
+                return new MessageToUserRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
             }
             catch (Exception ex)
             {

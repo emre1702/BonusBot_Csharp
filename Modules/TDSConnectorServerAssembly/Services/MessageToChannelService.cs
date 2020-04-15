@@ -24,7 +24,7 @@ namespace TDSConnectorServerAssembly
 
                 await channel.SendMessageAsync(request.Text);
 
-                return new MessageToChannelRequestReply { ErrorMessage = null };
+                return new MessageToChannelRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
             }
             catch (Exception ex)
             {
@@ -68,7 +68,7 @@ namespace TDSConnectorServerAssembly
 
                 await channel.SendMessageAsync(embed: embedBuilder.Build());
 
-                return new MessageToChannelRequestReply { ErrorMessage = null };
+                return new MessageToChannelRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
             }
             catch (Exception ex)
             {
