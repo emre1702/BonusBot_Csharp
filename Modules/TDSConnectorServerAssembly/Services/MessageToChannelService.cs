@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -22,7 +24,15 @@ namespace TDSConnectorServerAssembly
                 if (!(guild.GetChannel(request.ChannelId) is SocketTextChannel channel))
                     return new MessageToChannelRequestReply { ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", ErrorStackTrace = Environment.StackTrace };
 
-                await channel.SendMessageAsync(request.Text);
+                int maxSize = DiscordConfig.MaxMessageSize - 50;    // 50 just to be sure
+                var texts = Enumerable
+                    .Range(0, request.Text.Length / maxSize)
+                    .Select(i => request.Text.Substring(i * maxSize, maxSize));
+
+                foreach (var text in texts)
+                {
+                    await channel.SendMessageAsync(text);
+                }
 
                 return new MessageToChannelRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
             }
