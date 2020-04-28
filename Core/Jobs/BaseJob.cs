@@ -19,16 +19,23 @@ namespace BonusBot.Core.Jobs
             GC.SuppressFinalize(this);
         }
 
-        public Task InitializeAsync()
+        public async Task InitializeAsync()
         {
+            // CancellationTokenSource was cancelled, but the task didn't check it yet?
+            // So wait for the task to finish, so it doesn't use the new CancellationTokenSource
+            // and thinks it's still running
             if (!(_runningTask is null))
-                return Task.CompletedTask;
+            {
+                ConsoleHelper.Log(LogSeverity.Info, "Job", $"Waiting for {GetType().Name.Split('J')[0]} job to finish.");
+                await _runningTask;
+            }
+                
 
             CancellationTokenSource = new CancellationTokenSource();
             _runningTask = RunAsync();
 
-            ConsoleHelper.Log(LogSeverity.Info, "Job", $"Initialized {GetType().Name.Split('J')[0]} job with {TaskDelay.Seconds}s delay.");
-            return Task.CompletedTask;
+            ConsoleHelper.Log(LogSeverity.Info, "Job", $"Initialized {GetType().Name.Split('J')[0]} job.");
+            return;
         }
 
         protected abstract Task RunAsync();
@@ -38,12 +45,13 @@ namespace BonusBot.Core.Jobs
             TaskDelay = delay;
         }
 
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
                 return;
             CancellationTokenSource.Cancel(false);
             CancellationTokenSource.Dispose();
+            _runningTask = null;
         }
     }
 }
