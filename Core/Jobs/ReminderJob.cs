@@ -24,9 +24,9 @@ namespace BonusBot.Core.Jobs
             while (!CancellationTokenSource.IsCancellationRequested)
             {
                 var reminders = _database.GetCollection<ReminderEntity>().FindAll()
-                    .Where(x => x.ExpiresOn <= DateTimeOffset.Now).ToArray();
+                    .Where(x => x.ExpiresOn <= DateTimeOffset.Now).ToList();
 
-                if (reminders.Length is 0)
+                if (reminders.Count == 0)
                     return;
 
                 foreach (var reminder in reminders)
@@ -41,11 +41,11 @@ namespace BonusBot.Core.Jobs
                             break;
 
                         case null when !(user is null):
-                            await user.SendMessageAsync("");
+                            await user.SendMessageAsync(reminder.Content);
                             break;
 
                         default:
-                            await channel.SendMessageAsync("");
+                            await channel.SendMessageAsync(reminder.Content);
                             break;
                     }
 
