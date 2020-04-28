@@ -10,10 +10,13 @@ namespace BonusBot.Common.ExtendedModules
     public sealed class CustomContext : SocketCommandContext
     {
         public new SocketGuildUser User { get; }
+        public SocketUser SocketUser { get; }
 
         public CustomContext(DiscordSocketClient client, SocketUserMessage msg) : base(client, msg)
         {
             User = msg.Author.CastTo<SocketGuildUser>();
+            SocketUser = msg.Author;
+            //SocketUser = base.User;
         }
 
         public async ValueTask<IUser> GetUserAsync(ulong id)

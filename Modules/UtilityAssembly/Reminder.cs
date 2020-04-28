@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using BonusBot.Common.Entities;
+using Discord;
 using Discord.Commands;
 
 namespace UtilityAssembly
@@ -9,8 +10,9 @@ namespace UtilityAssembly
     {
         [Command("reminder")]
         [Alias("SetReminder", "AddReminder", "ReminderSet", "ReminderAdd")]
+        [RequireContext(ContextType.DM | ContextType.Group | ContextType.Guild)]
         public async Task CreateReminder(string time, [Remainder] string content)
-        {
+        {         
             if (!GetTime(time, out DateTimeOffset? dateTimeOffset, out bool isPerma)
                 || /* Unmute */ !dateTimeOffset.HasValue
                 || /* Perma */ isPerma)
@@ -31,16 +33,29 @@ Please use with X as number:
             {
                 Id = new Guid(),
                 ExpiresOn = dateTimeOffset.Value,
-                GuildId = Context.Guild.Id, 
                 Content = content
             };
-            if (Context.IsPrivate)
-                reminderEntity.UserId = Context.User.Id;
-            else 
+            if (!Context.IsPrivate && Context.User.GetPermissions(Context.Channel as IGuildChannel).ManageMessages)
+            {
                 reminderEntity.ChannelId = Context.Channel.Id;
-
-            _databaseHandler.Save(reminderEntity);
-            await ReplyAsync($"Reminder is set for {dateTimeOffset.Value}");
+                reminderEntity.GuildId = Context.Guild.Id;
+                _databaseHandler.Save(reminderEntity);
+                await ReplyAsync($"Reminder is set for {dateTimeOffset.Value}");
+            }  
+            else
+            {
+                reminderEntity.UserId = Context.SocketUser.Id;
+                foreach (var guild in Context.Client.Guilds)
+                {
+                    if (guild.GetUser(reminderEntity.UserId) is { })
+                        reminderEntity.GuildId = guild.Id;
+                }
+                _databaseHandler.Save(reminderEntity);
+                if (Context.IsPrivate)
+                    await ReplyAsync($"Reminder is set for {dateTimeOffset.Value}");
+                else 
+                    await Context.SocketUser.SendMessageAsync($"Reminder is set for {dateTimeOffset.Value}");
+            }
         }
     }
 }
