@@ -40,7 +40,7 @@ Please use with X as number:
                 reminderEntity.ChannelId = Context.Channel.Id;
 
             _databaseHandler.Save(reminderEntity);
-            await ReplyAsync($"Reminder is set for {dateTimeOffset.Value} (UTC)");
+            await ReplyAsync($"Reminder is set for {dateTimeOffset.Value}");
         }
     }
 }

@@ -26,9 +26,6 @@ namespace BonusBot.Core.Jobs
                 var reminders = _database.GetCollection<ReminderEntity>().FindAll()
                     .Where(x => x.ExpiresOn <= DateTimeOffset.Now).ToList();
 
-                if (reminders.Count == 0)
-                    return;
-
                 foreach (var reminder in reminders)
                 {
                     var guild = _client.GetGuild(reminder.GuildId);
