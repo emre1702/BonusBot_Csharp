@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using Discord;
+using Discord.Net;
 using Discord.Rest;
 using Discord.WebSocket;
 using Grpc.Core;
@@ -34,7 +35,7 @@ namespace TDSConnectorServerAssembly
                 if (!(guild.GetChannel(request.ChannelId) is SocketTextChannel channel))
                     return new RAGEServerStatsRequestReply { ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", ErrorStackTrace = Environment.StackTrace };
 
-                await channel.ModifyAsync((properties) => properties.Name = "Server: Online");
+                await channel.ModifyAsync((properties) => properties.Name = "Server: Online", new RequestOptions { RetryMode = RetryMode.AlwaysRetry, Timeout = 5000 });
 
                 var datetimeNow = DateTimeOffset.UtcNow;
                 var embedBuilder = new EmbedBuilder()
@@ -76,7 +77,7 @@ namespace TDSConnectorServerAssembly
                 {
                     await channel.ModifyAsync((properties) => properties.Name = "Server: Offline");
 
-                    var msgList = await channel.GetMessagesAsync(1).FlattenAsync();
+                    var msgList = await channel.GetMessagesAsync(1, new RequestOptions { RetryMode = RetryMode.AlwaysRetry, Timeout = 5000 }).FlattenAsync();
                     var msg = msgList.FirstOrDefault();
 
                     if (msg is RestUserMessage message)
@@ -93,6 +94,10 @@ namespace TDSConnectorServerAssembly
 
                 return new RAGEServerStatsRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
             } 
+            catch (HttpException)
+            {
+                return new RAGEServerStatsRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+            }
             catch (Exception ex)
             {
                 return new RAGEServerStatsRequestReply 
