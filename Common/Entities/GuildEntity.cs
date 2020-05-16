@@ -27,6 +27,19 @@ namespace BonusBot.Common.Entities
         public bool UseRolesCommandSystem { get; set; }
         public string RolesRequestInfoText { get; set; }
 
+
+        public ulong SupportRequestCategoryId { get; set; }
+        public ulong SupportRequestChannelInfoId { get; set; }
+        public string SupportRequestInfo { get; set; }
+        public uint SupportRequestMinTitleLength { get; set; }
+        public uint SupportRequestMinTextLength { get; set; }
+        public uint SupportRequestMaxTitleLength { get; set; }
+        public uint SupportRequestMaxTextLength { get; set; }
+
+        public ulong SupporterRoleId { get; set; }
+        public ulong AdministratorRoleId { get; set; }
+
+
         [GitHubWebHookSettingProperty]
         public ulong GitHubWebHookPushChannelId { get; set; }
         [GitHubWebHookSettingProperty]

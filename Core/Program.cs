@@ -1,18 +1,21 @@
 ﻿using System;
+using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
+using BonusBot.Common.Defaults;
+using BonusBot.Common.Handlers;
+using BonusBot.Common.Helpers;
+using BonusBot.Common.Interfaces;
+using BonusBot.Core.Handlers;
+using Common.Handlers;
+using Common.Interfaces;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using InfluxDB.Collector;
 using Microsoft.Extensions.DependencyInjection;
-using BonusBot.Core.Handlers;
-using BonusBot.Common.Helpers;
-using BonusBot.Common.Interfaces;
+using TDSConnectorClient;
 using Victoria;
-using BonusBot.Common.Handlers;
-using BonusBot.Common.Defaults;
-using System.Globalization;
 
 namespace BonusBot.Core
 {
@@ -44,9 +47,11 @@ namespace BonusBot.Core
                     typeof(NewPlayerHandler),
                     typeof(AudioInfoHandler),
                     typeof(RolesHandler),
-                    typeof(RoleReactionHandler))
+                    typeof(RoleReactionHandler),
+                    typeof(SupportRequestHandler))
                 .AddSingleton(command)
                 .AddSingleton(socketClient)
+                .AddSingleton<ITDSClient, TDSClient>()
                 .BuildServiceProvider();
 
             //_provider.GetRequiredService<DatabaseHandler>().BuildConfiguration(out _config);

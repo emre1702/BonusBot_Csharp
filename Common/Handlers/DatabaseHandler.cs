@@ -65,7 +65,11 @@ namespace BonusBot.Common.Handlers
                     Id = x,
                     Prefix = '!',
                     WelcomeMessage = "HEY %u%, WELCOME TO %g%! Enjoy your stay!",
-                    RoleForMutedSuffix = "Muted"
+                    RoleForMutedSuffix = "Muted",
+                    SupportRequestMinTitleLength = 10,
+                    SupportRequestMaxTitleLength = 80,
+                    SupportRequestMinTextLength = 10,
+                    SupportRequestMaxTextLength = 255,
                 });
             collection.InsertBulk(entities);
         }

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using Common.Handlers;
 
 namespace BonusBot.Core.Handlers
 {
@@ -103,7 +104,7 @@ namespace BonusBot.Core.Handlers
                 {
                     context.Assembly.EntryPoint.Invoke(null, null);
                     var programClass = context.Assembly.GetTypes().FirstOrDefault(t => t.Name == "Program");
-                    programClass?.GetProperty("DiscordClient")?.SetValue(null, _provider.GetRequiredService<DiscordSocketClient>());
+                    programClass?.GetProperty("ServiceProvider")?.SetValue(null, _provider);
                 }
                 else
                 {

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Grpc.Core;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TDSConnectorServerAssembly
 {
@@ -14,7 +15,7 @@ namespace TDSConnectorServerAssembly
         {
             try
             {
-                var client = Program.DiscordClient;
+                var client = Program.ServiceProvider.GetRequiredService<DiscordSocketClient>();
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
@@ -44,7 +45,7 @@ namespace TDSConnectorServerAssembly
         {
             try
             {
-                var client = Program.DiscordClient;
+                var client = Program.ServiceProvider.GetRequiredService<DiscordSocketClient>();
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)

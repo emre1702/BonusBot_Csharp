@@ -19,6 +19,8 @@ using WebHook.Entity;
 using WebHook;
 using System.Collections.Generic;
 using LiteDB;
+using Common.Helpers;
+using System.Threading.Channels;
 
 namespace BonusBot.Core.Handlers
 {
@@ -279,11 +281,30 @@ namespace BonusBot.Core.Handlers
 
                 argPos = 0;
                 if (!message.HasCharPrefix(guild.Prefix, ref argPos) && !message.HasMentionPrefix(_socketClient.CurrentUser, ref argPos))
+                {
+                    if (ChannelHelper.IsOnlyCommandsChannel(guild, message.Channel))
+                        await message.DeleteAsync();
                     return;
+                }
+                    
             }            
 
             var context = new CustomContext(_socketClient, message);
-            await _commandService.ExecuteAsync(context, argPos, _serviceProvider, MultiMatchHandling.Best);
+            var result = await _commandService.ExecuteAsync(context, argPos, _serviceProvider, MultiMatchHandling.Best);
+
+            if (!result.IsSuccess)
+            {
+                await socketMessage.Author.SendMessageAsync($"{result.Error} error occured. Message:{Environment.NewLine}\"{result.ErrorReason}\"{Environment.NewLine}Used command: \"{message.Content}\"");
+
+                if (message.Channel is SocketGuildChannel channel)
+                {
+                    var guildId = channel.Guild.Id;
+                    var guild = _databaseHandler.Get<GuildEntity>(guildId);
+                    if (ChannelHelper.IsOnlyCommandsChannel(guild, message.Channel))
+                        await message.DeleteAsync();
+                }
+            }
+                
         }
 
         private async Task<bool> HandleTag(string msg, ulong guildId, ISocketMessageChannel channel)

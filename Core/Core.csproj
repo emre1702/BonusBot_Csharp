@@ -20,8 +20,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\Modules\TDSAssembly\TDSAssembly.csproj" />
     <ProjectReference Include="..\Modules\TDSConnectorServerAssembly\TDSConnectorServerAssembly.csproj" />
+    <ProjectReference Include="..\TDSConnectorClient\TDSConnectorClient.csproj" />
     <ProjectReference Include="..\WebHook\WebHook.csproj" />
   </ItemGroup>
 

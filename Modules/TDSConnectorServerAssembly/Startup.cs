@@ -30,6 +30,7 @@ namespace TDSConnectorServerAssembly
                 endpoints.MapGrpcService<RAGEServerStatsService>();
                 endpoints.MapGrpcService<MessageToChannelService>();
                 endpoints.MapGrpcService<MessageToUserService>();
+                endpoints.MapGrpcService<SupportRequestService>();
 
                 endpoints.MapGet("/", async context =>
                 {

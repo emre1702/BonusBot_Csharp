@@ -74,7 +74,11 @@ namespace BonusBot.Common.Handlers
                 {
                     await EditRoleReactionMessage(rolesChannel.Guild.Id, pinnedMessages.Last() as RestUserMessage);
                 }
+            }
 
+            if (guildEntity.SupportRequestChannelInfoId != 0 && !string.IsNullOrWhiteSpace(guildEntity.SupportRequestInfo))
+            {
+                await AddSupportInfoChannel(guild, guildEntity.SupportRequestChannelInfoId, guildEntity.SupportRequestInfo);
             }
         }
 
@@ -148,6 +152,22 @@ namespace BonusBot.Common.Handlers
                .Select(emojiStr => _emojiByEmojiName[emojiStr])
                .ToArray();
             await msg.AddReactionsAsync(emojisToAdd);
+        }
+
+        private async Task AddSupportInfoChannel(SocketGuild guild, ulong channelId, string text)
+        {
+            var channel = guild.GetTextChannel(channelId);
+            if (channel is null)
+                return;
+
+            var messages = await channel.GetPinnedMessagesAsync();
+            
+            if (messages.Count == 0)
+            {
+                var newMessage = await channel.SendMessageAsync(text.Replace());
+                await newMessage.PinAsync();
+            }
+            
         }
     }
 }

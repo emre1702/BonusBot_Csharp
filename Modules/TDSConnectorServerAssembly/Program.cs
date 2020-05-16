@@ -1,4 +1,7 @@
-﻿using Discord.WebSocket;
+﻿using System;
+using BonusBot.Common.Handlers;
+using Common.Handlers;
+using Discord.WebSocket;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -8,7 +11,7 @@ namespace TDSConnectorServerAssembly
     public class Program
     {
         #nullable disable
-        public static DiscordSocketClient DiscordClient { get; set; }
+        public static IServiceProvider ServiceProvider { get; set; }
         #nullable restore
 
         public static void Main() 

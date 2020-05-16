@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Helpers;
 using Discord;
 using Discord.WebSocket;
 using Grpc.Core;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TDSConnectorServerAssembly
 {
@@ -15,7 +17,7 @@ namespace TDSConnectorServerAssembly
         {
             try
             {
-                var client = Program.DiscordClient;
+                var client = Program.ServiceProvider.GetRequiredService<DiscordSocketClient>();
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
@@ -25,9 +27,7 @@ namespace TDSConnectorServerAssembly
                     return new MessageToChannelRequestReply { ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", ErrorStackTrace = Environment.StackTrace };
 
                 int maxSize = DiscordConfig.MaxMessageSize - 50;    // 50 just to be sure
-                var texts = Enumerable
-                    .Range(0, request.Text.Length / maxSize)
-                    .Select(i => request.Text.Substring(i * maxSize, maxSize));
+                var texts = StringHelper.SplitByLength(request.Text, maxSize);
 
                 foreach (var text in texts)
                 {
@@ -50,7 +50,7 @@ namespace TDSConnectorServerAssembly
         {
             try
             {
-                var client = Program.DiscordClient;
+                var client = Program.ServiceProvider.GetRequiredService<DiscordSocketClient>();
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)

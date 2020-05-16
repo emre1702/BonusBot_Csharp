@@ -5,6 +5,7 @@ using BonusBot.Common.Entities;
 using BonusBot.Common.ExtendedModules;
 using BonusBot.Common.Handlers;
 using BonusBot.Common.Helpers;
+using Common.Interfaces;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -14,10 +15,12 @@ namespace UtilityAssembly
     public sealed partial class UtilityModule : CommandBase
     {
         private readonly DatabaseHandler _databaseHandler;
+        private readonly ITDSClient _tdsClient;
 
-        public UtilityModule(DatabaseHandler databaseHandler)
+        public UtilityModule(DatabaseHandler databaseHandler, ITDSClient tdsClient)
         {
             _databaseHandler = databaseHandler;
+            _tdsClient = tdsClient;
         }
 
         [Command("info")]
@@ -36,7 +39,7 @@ namespace UtilityAssembly
                 .AddField("Created:", target.CreatedAt.ToLocalTime(), true)
                 .AddField("Joined:", target.JoinedAt.HasValue ? target.JoinedAt.Value.ToLocalTime().ValueToString() : "unknown");
             await ReplyAsync(builder);
-            
+
             var ban = _databaseHandler.Get<CaseEntity>($"{target.Id}-Ban");
             if (ban != null)
                 await ReplyAsync(ban.ToEmbedBuilder(Context.Client));
