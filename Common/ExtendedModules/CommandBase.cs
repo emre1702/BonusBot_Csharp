@@ -32,40 +32,6 @@ namespace BonusBot.Common.ExtendedModules
             return new CustomResult(null, embed.Build());
         }
 
-        protected (string, string) UseQuotationMarksForFirstText(string firstText, string secondText)
-        {
-            char quotationMark = firstText[0];
-            if (quotationMark != '"' && quotationMark != '\'')
-                return (firstText, secondText);
-
-            if (firstText[^1] == quotationMark)
-                return (firstText, secondText);
-
-            var quotationMarkEndIndex = secondText.IndexOf(quotationMark);
-            if (quotationMarkEndIndex < 0)
-                return (firstText, secondText);
-
-            firstText = firstText.Substring(1) + secondText.Substring(0, quotationMarkEndIndex);
-
-            if (secondText.Length == quotationMarkEndIndex)
-                secondText = string.Empty;
-            else 
-                secondText = secondText.Substring(quotationMarkEndIndex + 1);
-
-            return (firstText, secondText);
-        }
-
-        protected string RemoveQuotationMarksAtStartAndEnd(string text)
-        {
-            char quotationMark = text[0];
-            if (quotationMark != '"' && quotationMark != '\'')
-                return text;
-            if (text[^1] != quotationMark)
-                return text;
-
-            return text[1..^0];
-        }
-
         protected bool GetTime(string time, out DateTimeOffset? dateTimeOffset, out bool isPerma)
         {
             dateTimeOffset = null;
@@ -144,6 +110,7 @@ namespace BonusBot.Common.ExtendedModules
                 || time.Equals("perma", StringComparison.CurrentCultureIgnoreCase)
                 || time.Equals("permamute", StringComparison.CurrentCultureIgnoreCase)
                 || time.Equals("permaban", StringComparison.CurrentCultureIgnoreCase)
+                || time.Equals("permanent", StringComparison.CurrentCultureIgnoreCase)
                 || time.Equals("never", StringComparison.CurrentCultureIgnoreCase);
         }
 

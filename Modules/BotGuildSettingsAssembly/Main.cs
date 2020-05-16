@@ -13,6 +13,7 @@ using BonusBot.Common.Attributes;
 using System.Collections.Generic;
 using Common.Attributes;
 using Common.Handlers;
+using Common.Helpers;
 
 namespace BotGuildSettingsAssembly
 {
@@ -46,7 +47,7 @@ namespace BotGuildSettingsAssembly
         }
 
         [Command("help")]
-        public Task Start()
+        public async Task Start()
         {
             var builder = new StringBuilder();
             builder.AppendLine("With the config command you are able to configurate the guild settings.");
@@ -62,7 +63,15 @@ namespace BotGuildSettingsAssembly
                 builder.AppendLine("Not set settings are:");
                 builder.AppendJoin(", ", notSetted);
             }
-            return ReplyAsync(builder.ToString());
+
+            var msg = builder.ToString();
+            int maxSize = DiscordConfig.MaxMessageSize - 50;    // 50 just to be sure
+            var texts = StringHelper.SplitByLength(msg, maxSize);
+
+            foreach (var text in texts)
+            {
+                await ReplyAsync(text);
+            }
         }
 
         [Command]
