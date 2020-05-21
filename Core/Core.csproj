@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="InfluxDB.Collector" Version="1.1.1-dev-10109" />
+    <PackageReference Include="InfluxDB.Collector" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>

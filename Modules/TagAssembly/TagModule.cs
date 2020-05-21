@@ -16,7 +16,7 @@ namespace TagAssembly
     public sealed class TagModule : CommandBase
     {
         private readonly DatabaseHandler _database;
-        private LiteCollection<TagEntity> _tagsCollection;
+        private ILiteCollection<TagEntity> _tagsCollection;
 
         public TagModule(DatabaseHandler databaseHandler)
         {
