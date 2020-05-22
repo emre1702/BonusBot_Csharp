@@ -13,7 +13,7 @@ namespace UtilityAssembly
             try
             {
                 var context = (SocketCommandContext)Context;
-                var reply = await _tdsClient.UsedCommand(context.User.Id, "ConfirmTDS", null);
+                var reply = await _tdsClient.Command.UsedCommand(context.User.Id, "ConfirmTDS");
 
                 await ReplyAsync(reply ?? "Command was sent");
             }
