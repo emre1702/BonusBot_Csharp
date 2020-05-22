@@ -6,6 +6,8 @@ namespace Common.Interfaces
 #nullable enable
     public interface ITDSClient
     {
-        Task<string> UsedCommand(ulong userId, string command, List<string>? args = null);
+        ITDSClientCommand Command { get; }
+        ITDSClientSupportRequest SupportRequest { get; }
+        
     }
 }

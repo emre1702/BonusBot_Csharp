@@ -60,7 +60,7 @@ namespace TDSConnectorServerAssembly
             }
         }
 
-        public override async Task<SupportRequestAnswerReply> Answer(SupportRequestAnswerRequest request, ServerCallContext context)
+        public override async Task<SupportRequestReply> Answer(SupportRequestAnswerRequest request, ServerCallContext context)
         {
             try
             {
@@ -68,36 +68,82 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new SupportRequestAnswerReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
 
                 var guildEntity = Program.ServiceProvider.GetRequiredService<DatabaseHandler>()
                     .Get<GuildEntity>(guild.Id);
                 if (guildEntity is null)
-                    return new SupportRequestAnswerReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
 
                 var categoryId = guildEntity.SupportRequestCategoryId;
                 if (categoryId == 0)
-                    return new SupportRequestAnswerReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
                 var supportRequestCategory = guild.GetCategoryChannel(categoryId);
                 if (supportRequestCategory is null)
-                    return new SupportRequestAnswerReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
 
                 var channel = supportRequestCategory.Channels
                     .OfType<SocketTextChannel>()
-                    .FirstOrDefault(c => c.Name == "support_" + request.SupportRequestId);
+                    .FirstOrDefault(c => c.Name.EndsWith("support_" + request.SupportRequestId));
                 if (channel is null)
-                    return new SupportRequestAnswerReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+
+                var supportRequestHandler = Program.ServiceProvider.GetRequiredService<SupportRequestHandler>();
+                if (channel.Name.StartsWith("closed-"))
+                    await supportRequestHandler.ToggleClosedRequest(channel, null, request.AuthorName, false, false);
 
                 request.Text = $"Answer from {request.AuthorName}:\n" + request.Text;
 
-                await Program.ServiceProvider.GetRequiredService<SupportRequestHandler>()
-                    .AnswerRequest(guild, channel, null, request.AuthorName, request.Text, false);
+                await supportRequestHandler.AnswerRequest(channel, null, request.AuthorName, request.Text, false);
 
-                return new SupportRequestAnswerReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
             }
             catch (Exception ex)
             {
-                return new SupportRequestAnswerReply
+                return new SupportRequestReply
+                {
+                    ErrorMessage = ex.GetBaseException().Message,
+                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace
+                };
+            }
+        }
+
+        public override async Task<SupportRequestReply> ToggleClosed(SupportRequestToggleClosedRequest request, ServerCallContext context)
+        {
+            try
+            {
+                var client = Program.ServiceProvider.GetRequiredService<DiscordSocketClient>();
+
+                var guild = client.GetGuild(request.GuildId);
+                if (guild is null)
+                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+
+                var guildEntity = Program.ServiceProvider.GetRequiredService<DatabaseHandler>()
+                    .Get<GuildEntity>(guild.Id);
+                if (guildEntity is null)
+                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+
+                var categoryId = guildEntity.SupportRequestCategoryId;
+                if (categoryId == 0)
+                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                var supportRequestCategory = guild.GetCategoryChannel(categoryId);
+                if (supportRequestCategory is null)
+                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+
+                var channel = supportRequestCategory.Channels
+                    .OfType<SocketTextChannel>()
+                    .FirstOrDefault(c => c.Name.EndsWith("support_" + request.SupportRequestId));
+                if (channel is null)
+                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+
+                await Program.ServiceProvider.GetRequiredService<SupportRequestHandler>()
+                    .ToggleClosedRequest(channel, null, request.RequesterName, request.Closed, false);
+
+                return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+            }
+            catch (Exception ex)
+            {
+                return new SupportRequestReply
                 {
                     ErrorMessage = ex.GetBaseException().Message,
                     ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace

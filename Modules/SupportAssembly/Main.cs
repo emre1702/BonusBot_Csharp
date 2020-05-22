@@ -101,22 +101,38 @@ namespace SupportAssembly
             await _supportRequestHandler.CreateRequest(Context.Guild, Context.User, Context.User.Nickname, title, text, supportType, atLeastAdminLevel, true);
         }
 
-        [Command("answer")]
-        public async void Answer([Remainder] string text)
+        [Command("open")]
+        public async Task Open()
         {
-            if (_guildEntity is null)
-                return;
-            if (!(Context.Channel is SocketTextChannel channel))
-                return;
-
-            if (text.Length > _guildEntity.SupportRequestMaxTextLength)
+            if (_guildEntity is null
+                || !(Context.Channel is SocketTextChannel channel)
+                || _guildEntity.SupportRequestCategoryId == 0
+                || channel.CategoryId != _guildEntity.SupportRequestCategoryId
+                || channel.Id == _guildEntity.SupportRequestChannelInfoId
+                )
             {
-                await Context.User.SendMessageAsync($"The text can be a maximum of {_guildEntity.SupportRequestMaxTextLength} characters long.");
+                await Context.Message.DeleteAsync();
                 return;
             }
 
-            if (!await _supportRequestHandler.AnswerRequest(Context.Guild, channel, Context.User, Context.User.Nickname, text, true))
+            await _supportRequestHandler.ToggleClosedRequest(channel, Context.User, Context.User.Nickname, false, true);
+        }
+
+        [Command("close")]
+        public async Task Close()
+        {
+            if (_guildEntity is null
+                || !(Context.Channel is SocketTextChannel channel)
+                || _guildEntity.SupportRequestCategoryId == 0
+                || channel.CategoryId != _guildEntity.SupportRequestCategoryId
+                || channel.Id == _guildEntity.SupportRequestChannelInfoId
+                )
+            {
                 await Context.Message.DeleteAsync();
+                return;
+            }
+
+            await _supportRequestHandler.ToggleClosedRequest(channel, Context.User, Context.User.Nickname, true, true);
         }
     }
 }

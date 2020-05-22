@@ -35,10 +35,12 @@ namespace BonusBot.Core.Handlers
         private readonly DatabaseHandler _databaseHandler;
         private readonly RolesHandler _rolesHandler;
         private readonly RoleReactionHandler _roleReactionHandler;
+        private readonly SupportRequestHandler _supportRequestHandler;
 
         public EventsHandler(IServiceProvider provider,
             DiscordSocketClient socketClient, CommandService commandService, MetricsJob metricsJob, JobHandler jobHandler,
-            LavaSocketClient lavaSocketClient, DatabaseHandler databaseHandler, RolesHandler rolesHandler, RoleReactionHandler roleReactionHandler)
+            LavaSocketClient lavaSocketClient, DatabaseHandler databaseHandler, RolesHandler rolesHandler, RoleReactionHandler roleReactionHandler,
+            SupportRequestHandler supportRequestHandler)
         {
             _socketClient = socketClient;
             _commandService = commandService;
@@ -48,6 +50,7 @@ namespace BonusBot.Core.Handlers
             _databaseHandler = databaseHandler;
             _rolesHandler = rolesHandler;
             _roleReactionHandler = roleReactionHandler;
+            _supportRequestHandler = supportRequestHandler;
 
             _lavaSocketClient = lavaSocketClient;
             _lavaSocketClient.Log += OnLog;
@@ -170,7 +173,7 @@ namespace BonusBot.Core.Handlers
             });
         }
 
-        private async Task CheckCaseEntities(SocketGuild guild, LiteCollection<CaseEntity> collection)
+        private async Task CheckCaseEntities(SocketGuild guild, ILiteCollection<CaseEntity> collection)
         {
             var caseEntites = collection.Find(entity => entity.GuildId == guild.Id);
             foreach (var entity in caseEntites)
@@ -282,6 +285,8 @@ namespace BonusBot.Core.Handlers
                 argPos = 0;
                 if (!message.HasCharPrefix(guild.Prefix, ref argPos) && !message.HasMentionPrefix(_socketClient.CurrentUser, ref argPos))
                 {
+                    if (ChannelHelper.IsSupportChannel(guild, message.Channel))
+                        await _supportRequestHandler.HandleMessage(guild, message);
                     if (ChannelHelper.IsOnlyCommandsChannel(guild, message.Channel))
                         await message.DeleteAsync();
                     return;
