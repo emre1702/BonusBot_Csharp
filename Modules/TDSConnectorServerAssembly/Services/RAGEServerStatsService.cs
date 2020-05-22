@@ -31,10 +31,20 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new RAGEServerStatsRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", ErrorStackTrace = Environment.StackTrace };
+                    return new RAGEServerStatsRequestReply 
+                    { 
+                        ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", 
+                        ErrorStackTrace = Environment.StackTrace,
+                        ErrorType = string.Empty
+                    };
 
                 if (!(guild.GetChannel(request.ChannelId) is SocketTextChannel channel))
-                    return new RAGEServerStatsRequestReply { ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", ErrorStackTrace = Environment.StackTrace };
+                    return new RAGEServerStatsRequestReply 
+                    { 
+                        ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", 
+                        ErrorStackTrace = Environment.StackTrace,
+                        ErrorType = string.Empty
+                    };
 
                 await channel.ModifyAsync((properties) => properties.Name = "Server: Online", new RequestOptions { RetryMode = RetryMode.AlwaysRetry, Timeout = 5000 });
 
@@ -93,18 +103,30 @@ namespace TDSConnectorServerAssembly
                 _checkServerOfflineTimer.Start();
 
 
-                return new RAGEServerStatsRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                return new RAGEServerStatsRequestReply 
+                { 
+                    ErrorMessage = string.Empty, 
+                    ErrorStackTrace = string.Empty,
+                    ErrorType = string.Empty
+                };
             } 
             catch (HttpException)
             {
-                return new RAGEServerStatsRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                return new RAGEServerStatsRequestReply
+                { 
+                    ErrorMessage = string.Empty, 
+                    ErrorStackTrace = string.Empty,
+                    ErrorType = string.Empty
+                };
             }
             catch (Exception ex)
             {
+                var baseEx = ex.GetBaseException();
                 return new RAGEServerStatsRequestReply 
                 { 
-                    ErrorMessage = ex.GetBaseException().Message,
-                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace
+                    ErrorMessage = baseEx.Message,
+                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace,
+                    ErrorType = ex.GetType().Name + "|" + baseEx.GetType().Name
                 };
             }
            

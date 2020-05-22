@@ -19,24 +19,41 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new MessageToUserRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", ErrorStackTrace = Environment.StackTrace };
+                    return new MessageToUserRequestReply 
+                    { 
+                        ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", 
+                        ErrorStackTrace = Environment.StackTrace,
+                        ErrorType = string.Empty
+                    };
 
                 SocketGuildUser? target = guild.GetUser(request.UserId);
 
                 if (target is null)
-                    return new MessageToUserRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new MessageToUserRequestReply 
+                    { 
+                        ErrorMessage = string.Empty, 
+                        ErrorStackTrace = string.Empty,
+                        ErrorType = string.Empty
+                    };
 
                 var privateChat = await target.GetOrCreateDMChannelAsync();
                 await privateChat.SendMessageAsync(request.Text);
 
-                return new MessageToUserRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                return new MessageToUserRequestReply 
+                { 
+                    ErrorMessage = string.Empty, 
+                    ErrorStackTrace = string.Empty,
+                    ErrorType = string.Empty
+                };
             }
             catch (Exception ex)
             {
+                var baseEx = ex.GetBaseException();
                 return new MessageToUserRequestReply
                 {
-                    ErrorMessage = ex.GetBaseException().Message,
-                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace
+                    ErrorMessage = baseEx.Message,
+                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace,
+                    ErrorType = ex.GetType().Name + "|" + baseEx.GetType().Name
                 };
             }
         }
@@ -49,11 +66,21 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new MessageToUserRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", ErrorStackTrace = Environment.StackTrace };
+                    return new MessageToUserRequestReply 
+                    { 
+                        ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", 
+                        ErrorStackTrace = Environment.StackTrace,
+                        ErrorType = string.Empty
+                    };
 
                 SocketGuildUser? target = guild.GetUser(request.UserId);
                 if (target is null)
-                    return new MessageToUserRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new MessageToUserRequestReply 
+                    { 
+                        ErrorMessage = string.Empty, 
+                        ErrorStackTrace = string.Empty,
+                        ErrorType = string.Empty
+                    };
 
                 var embedBuilder = new EmbedBuilder();
 
@@ -74,14 +101,21 @@ namespace TDSConnectorServerAssembly
                 var privateChat = await target.GetOrCreateDMChannelAsync();
                 await privateChat.SendMessageAsync(embed: embedBuilder.Build());
 
-                return new MessageToUserRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                return new MessageToUserRequestReply 
+                { 
+                    ErrorMessage = string.Empty, 
+                    ErrorStackTrace = string.Empty,
+                    ErrorType = string.Empty
+                };
             }
             catch (Exception ex)
             {
+                var baseEx = ex.GetBaseException();
                 return new MessageToUserRequestReply
                 {
-                    ErrorMessage = ex.GetBaseException().Message,
-                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace
+                    ErrorMessage = baseEx.Message,
+                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace,
+                    ErrorType = ex.GetType().Name + "|" + baseEx.GetType().Name
                 };
             }
         }

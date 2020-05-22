@@ -27,7 +27,8 @@ namespace TDSConnectorServerAssembly
                     {
                         ErrorMessage = $"The guild with Id {request.GuildId} does not exist.",
                         ErrorStackTrace = Environment.StackTrace,
-                        CreatedChannelId = 0
+                        CreatedChannelId = 0,
+                        ErrorType = string.Empty
                     };
 
                 var user = guild.GetUser(request.UserId);
@@ -36,7 +37,8 @@ namespace TDSConnectorServerAssembly
                     {
                         ErrorMessage = $"The user with Id {request.UserId} does not exist.",
                         ErrorStackTrace = Environment.StackTrace,
-                        CreatedChannelId = 0
+                        CreatedChannelId = 0,
+                        ErrorType = string.Empty
                     };
 
                 await Program.ServiceProvider.GetRequiredService<SupportRequestHandler>()
@@ -46,16 +48,19 @@ namespace TDSConnectorServerAssembly
                 {
                     ErrorMessage = string.Empty,
                     ErrorStackTrace = string.Empty,
-                    CreatedChannelId = 0
+                    CreatedChannelId = 0,
+                    ErrorType = string.Empty
                 };
             }
             catch (Exception ex)
             {
+                var baseEx = ex.GetBaseException();
                 return new SupportRequestCreateReply
                 {
-                    ErrorMessage = ex.GetBaseException().Message,
+                    ErrorMessage = baseEx.Message,
                     ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace,
-                    CreatedChannelId = 0
+                    CreatedChannelId = 0,
+                    ErrorType = ex.GetType().Name + "|" + baseEx.GetType().Name
                 };
             }
         }
@@ -68,25 +73,50 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply 
+                    { 
+                        ErrorMessage = string.Empty, 
+                        ErrorStackTrace = string.Empty,
+                        ErrorType = string.Empty
+                    };
 
                 var guildEntity = Program.ServiceProvider.GetRequiredService<DatabaseHandler>()
                     .Get<GuildEntity>(guild.Id);
                 if (guildEntity is null)
-                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply 
+                    { 
+                        ErrorMessage = string.Empty, 
+                        ErrorStackTrace = string.Empty,
+                        ErrorType = string.Empty
+                    };
 
                 var categoryId = guildEntity.SupportRequestCategoryId;
                 if (categoryId == 0)
-                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply 
+                    { 
+                        ErrorMessage = string.Empty, 
+                        ErrorStackTrace = string.Empty,
+                        ErrorType = string.Empty
+                    };
                 var supportRequestCategory = guild.GetCategoryChannel(categoryId);
                 if (supportRequestCategory is null)
-                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply 
+                    { 
+                        ErrorMessage = string.Empty, 
+                        ErrorStackTrace = string.Empty,
+                        ErrorType = string.Empty
+                    };
 
                 var channel = supportRequestCategory.Channels
                     .OfType<SocketTextChannel>()
                     .FirstOrDefault(c => c.Name.EndsWith("support_" + request.SupportRequestId));
                 if (channel is null)
-                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply 
+                    { 
+                        ErrorMessage = string.Empty, 
+                        ErrorStackTrace = string.Empty,
+                        ErrorType = string.Empty
+                    };
 
                 var supportRequestHandler = Program.ServiceProvider.GetRequiredService<SupportRequestHandler>();
                 if (channel.Name.StartsWith("closed-"))
@@ -96,14 +126,21 @@ namespace TDSConnectorServerAssembly
 
                 await supportRequestHandler.AnswerRequest(channel, null, request.AuthorName, request.Text, false);
 
-                return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                return new SupportRequestReply 
+                { 
+                    ErrorMessage = string.Empty, 
+                    ErrorStackTrace = string.Empty,
+                    ErrorType = string.Empty
+                };
             }
             catch (Exception ex)
             {
+                var baseEx = ex.GetBaseException();
                 return new SupportRequestReply
                 {
-                    ErrorMessage = ex.GetBaseException().Message,
-                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace
+                    ErrorMessage = baseEx.Message,
+                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace,
+                    ErrorType = ex.GetType().Name + "|" + baseEx.GetType().Name
                 };
             }
         }
@@ -116,37 +153,60 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply 
+                    { 
+                        ErrorMessage = string.Empty, 
+                        ErrorStackTrace = string.Empty,
+                        ErrorType = string.Empty
+                    };
 
                 var guildEntity = Program.ServiceProvider.GetRequiredService<DatabaseHandler>()
                     .Get<GuildEntity>(guild.Id);
                 if (guildEntity is null)
-                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply 
+                    { 
+                        ErrorMessage = string.Empty, 
+                        ErrorStackTrace = string.Empty,
+                        ErrorType = string.Empty
+                    };
 
                 var categoryId = guildEntity.SupportRequestCategoryId;
                 if (categoryId == 0)
-                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply 
+                    { 
+                        ErrorMessage = string.Empty, 
+                        ErrorStackTrace = string.Empty,
+                        ErrorType = string.Empty
+                    };
                 var supportRequestCategory = guild.GetCategoryChannel(categoryId);
                 if (supportRequestCategory is null)
-                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty,
+                        ErrorType = string.Empty
+                    };
 
                 var channel = supportRequestCategory.Channels
                     .OfType<SocketTextChannel>()
                     .FirstOrDefault(c => c.Name.EndsWith("support_" + request.SupportRequestId));
                 if (channel is null)
-                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                    return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty,
+                        ErrorType = string.Empty
+                    };
 
                 await Program.ServiceProvider.GetRequiredService<SupportRequestHandler>()
                     .ToggleClosedRequest(channel, null, request.RequesterName, request.Closed, false);
 
-                return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty,
+                    ErrorType = string.Empty
+                };
             }
             catch (Exception ex)
             {
+                var baseEx = ex.GetBaseException();
                 return new SupportRequestReply
                 {
-                    ErrorMessage = ex.GetBaseException().Message,
-                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace
+                    ErrorMessage = baseEx.Message,
+                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace,
+                    ErrorType = ex.GetType().Name + "|" + baseEx.GetType().Name
                 };
             }
         }

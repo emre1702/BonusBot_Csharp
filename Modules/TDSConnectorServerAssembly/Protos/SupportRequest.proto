@@ -43,10 +43,12 @@ message SupportRequestDeleteRequest {
 message SupportRequestCreateReply {
     string errorMessage = 1;
     string errorStackTrace = 2;
-    uint64 createdChannelId = 3;
+    string errorType = 3;
+    uint64 createdChannelId = 4;
 }
 
 message SupportRequestReply {
     string errorMessage = 1;
     string errorStackTrace = 2;
+    string errorType = 3;
 }

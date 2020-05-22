@@ -21,10 +21,20 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new MessageToChannelRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", ErrorStackTrace = Environment.StackTrace };
+                    return new MessageToChannelRequestReply 
+                    { 
+                        ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", 
+                        ErrorStackTrace = Environment.StackTrace, 
+                        ErrorType = string.Empty 
+                    };
 
                 if (!(guild.GetChannel(request.ChannelId) is SocketTextChannel channel))
-                    return new MessageToChannelRequestReply { ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", ErrorStackTrace = Environment.StackTrace };
+                    return new MessageToChannelRequestReply 
+                    { 
+                        ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", 
+                        ErrorStackTrace = Environment.StackTrace,
+                        ErrorType = string.Empty
+                    };
 
                 int maxSize = DiscordConfig.MaxMessageSize - 50;    // 50 just to be sure
                 var texts = StringHelper.SplitByLength(request.Text, maxSize);
@@ -34,14 +44,21 @@ namespace TDSConnectorServerAssembly
                     await channel.SendMessageAsync(text);
                 }
 
-                return new MessageToChannelRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                return new MessageToChannelRequestReply 
+                { 
+                    ErrorMessage = string.Empty, 
+                    ErrorStackTrace = string.Empty,
+                    ErrorType = string.Empty
+                };
             }
             catch (Exception ex)
             {
+                var baseEx = ex.GetBaseException();
                 return new MessageToChannelRequestReply
                 {
-                    ErrorMessage = ex.GetBaseException().Message,
-                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace
+                    ErrorMessage = baseEx.Message,
+                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace,
+                    ErrorType = ex.GetType().Name + "|" + baseEx.GetType().Name
                 };
             }
         }
@@ -54,10 +71,20 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new MessageToChannelRequestReply { ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", ErrorStackTrace = Environment.StackTrace };
+                    return new MessageToChannelRequestReply 
+                    { 
+                        ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", 
+                        ErrorStackTrace = Environment.StackTrace,
+                        ErrorType = string.Empty
+                    };
 
                 if (!(guild.GetChannel(request.ChannelId) is SocketTextChannel channel))
-                    return new MessageToChannelRequestReply { ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", ErrorStackTrace = Environment.StackTrace };
+                    return new MessageToChannelRequestReply 
+                    { 
+                        ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", 
+                        ErrorStackTrace = Environment.StackTrace,
+                        ErrorType = string.Empty
+                    };
 
                 var embedBuilder = new EmbedBuilder();
 
@@ -78,14 +105,21 @@ namespace TDSConnectorServerAssembly
 
                 await channel.SendMessageAsync(embed: embedBuilder.Build());
 
-                return new MessageToChannelRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty };
+                return new MessageToChannelRequestReply 
+                { 
+                    ErrorMessage = string.Empty, 
+                    ErrorStackTrace = string.Empty,
+                    ErrorType = string.Empty
+                };
             }
             catch (Exception ex)
             {
+                var baseEx = ex.GetBaseException();
                 return new MessageToChannelRequestReply
                 {
-                    ErrorMessage = ex.GetBaseException().Message,
-                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace
+                    ErrorMessage = baseEx.Message,
+                    ErrorStackTrace = ex.StackTrace ?? Environment.StackTrace,
+                    ErrorType = ex.GetType().Name + "|" + baseEx.GetType().Name
                 };
             }
         }
