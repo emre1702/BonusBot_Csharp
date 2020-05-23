@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using BonusBot.Common.Entities;
 using Discord;
 using Discord.Commands;
-using LiteDB;
 
 namespace UtilityAssembly
 {
@@ -13,7 +12,7 @@ namespace UtilityAssembly
         [Alias("SetReminder", "AddReminder", "ReminderSet", "ReminderAdd")]
         [RequireContext(ContextType.DM | ContextType.Group | ContextType.Guild)]
         public async Task CreateReminder(string time, [Remainder] string content)
-        {         
+        {
             if (!GetTime(time, out DateTimeOffset? dateTimeOffset, out bool isPerma)
                 || /* Unmute */ !dateTimeOffset.HasValue
                 || /* Perma */ isPerma)
@@ -32,7 +31,7 @@ Please use with X as number:
 
             var reminderEntity = new ReminderEntity
             {
-                Id = ObjectId.NewObjectId(),
+                Id = new Guid(),
                 ExpiresOn = dateTimeOffset.Value,
                 Content = content
             };
@@ -42,7 +41,7 @@ Please use with X as number:
                 reminderEntity.GuildId = Context.Guild.Id;
                 _databaseHandler.Save(reminderEntity);
                 await ReplyAsync($"Reminder is set for {dateTimeOffset.Value}");
-            }  
+            }
             else
             {
                 reminderEntity.UserId = Context.SocketUser.Id;
@@ -54,7 +53,7 @@ Please use with X as number:
                 _databaseHandler.Save(reminderEntity);
                 if (Context.IsPrivate)
                     await ReplyAsync($"Reminder is set for {dateTimeOffset.Value}");
-                else 
+                else
                     await Context.SocketUser.SendMessageAsync($"Reminder is set for {dateTimeOffset.Value}");
             }
         }

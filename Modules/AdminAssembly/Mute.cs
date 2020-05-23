@@ -58,7 +58,7 @@ Please use with X as number:
                     _rolesHandler.ChangeRolesToMute(target);
                 var caseEntity = new CaseEntity
                 {
-                    Id = muteId.ToString(),
+                    Id = muteId,
                     UserId = targetSocketUser.Id,
                     CaseType = isPerma ? CaseType.Mute : CaseType.TempMute,
                     CreatedOn = DateTimeOffset.Now,

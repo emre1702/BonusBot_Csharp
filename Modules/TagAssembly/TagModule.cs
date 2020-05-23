@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Commands;
+using BonusBot.Common.Attributes;
 using BonusBot.Common.Entities;
 using BonusBot.Common.ExtendedModules;
-using BonusBot.Helpers;
 using BonusBot.Common.Handlers;
-using BonusBot.Common.Attributes;
+using BonusBot.Helpers;
+using Discord.Commands;
 using LiteDB;
 
 namespace TagAssembly
@@ -16,10 +16,17 @@ namespace TagAssembly
     public sealed class TagModule : CommandBase
     {
         private readonly DatabaseHandler _database;
+        private LiteCollection<TagEntity> _tagsCollection;
 
         public TagModule(DatabaseHandler databaseHandler)
         {
             _database = databaseHandler;
+        }
+
+        protected override void BeforeExecute(CommandInfo command)
+        {
+            _tagsCollection = _database.GetCollection<TagEntity>();
+            base.BeforeExecute(command);
         }
 
 
@@ -28,8 +35,8 @@ namespace TagAssembly
         [TagManageProviso]
         public async Task Add(string name, [Remainder] string content)
         {
-            var prevTag = await _database.GetCollection<TagEntity>(tagsCollection
-                => tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower()));
+            var prevTag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower());
+
             if (prevTag != null)
                 await ReplyAsync($"Tag `{prevTag.Id}` already exists. Try another name?");
 
@@ -55,12 +62,11 @@ namespace TagAssembly
         {
             name = name.Trim('\'', '"');
 
-            var tag = await _database.GetCollection<TagEntity>(tagsCollection
-                => tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower()));
+            var tag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower());
             if (tag is null)
                 await ReplyAsync($"`{name}` tag doesn't exist.");
 
-            _database.Delete(tag);
+            _tagsCollection.Delete(new BsonValue(tag.Id));
             await ReplyAsync($"Tag `{name}` has been deleted.");
         }
 
@@ -70,8 +76,7 @@ namespace TagAssembly
         {
             name = name.Trim('\'', '"');
 
-            var tag = await _database.GetCollection<TagEntity>(tagsCollection
-                => tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower()));
+            var tag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower());
 
             if (tag is null)
                 await ReplyAsync($"`{name}` tag doesn't exist.");
@@ -90,8 +95,7 @@ namespace TagAssembly
         [Priority(1)]
         public async Task All()
         {
-            var tags = await _database.GetCollection<TagEntity, string>(tagsCollection
-                => string.Join(", ", tagsCollection.Find(x => x.GuildId == Context.Guild.Id).Select(x => x.Id)));
+            var tags = string.Join(", ", _tagsCollection.Find(x => x.GuildId == Context.Guild.Id).Select(x => x.Id));
             await ReplyAsync(tags);
         }
     }

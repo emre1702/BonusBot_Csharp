@@ -3,7 +3,7 @@ using LiteDB;
 
 namespace BonusBot.Common.Entities
 {
-    public class BaseEntity : BsonDocument
+    public class BaseEntity
     {
         [NotConfigurableProperty]
         public object Id { get; set; }

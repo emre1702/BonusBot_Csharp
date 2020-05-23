@@ -27,12 +27,8 @@ namespace BonusBot.Core.Jobs
         {
             while (!CancellationTokenSource.IsCancellationRequested)
             {
-                var cases = await _database.GetCollection<CaseEntity, List<CaseEntity>>(collection =>
-                {
-                    return collection.FindAll()
-                        .Where(x => x.ExpiresOn < DateTimeOffset.Now && x.IsTempCase())
-                        .ToList();
-                });
+                var cases = _database.GetCollection<CaseEntity>().FindAll()
+                    .Where(x => x.ExpiresOn < DateTimeOffset.Now && x.IsTempCase());
 
                 foreach (var userCase in cases)
                 {
@@ -45,7 +41,7 @@ namespace BonusBot.Core.Jobs
                         switch (userCase.CaseType)
                         {
                             case CaseType.TempBan:
-                                guild.RemoveBanAsync(userCase.UserId).Wait();
+                                await guild.RemoveBanAsync(userCase.UserId);
                                 break;
 
                             case CaseType.TempMute:
@@ -57,7 +53,7 @@ namespace BonusBot.Core.Jobs
                             case CaseType.TempBlock:
                                 var channel = guild.GetTextChannel(userCase.ChannelId);
                                 if (user != null)
-                                    channel.RemovePermissionOverwriteAsync(user).Wait();
+                                    await channel.RemovePermissionOverwriteAsync(user);
                                 break;
 
                             case CaseType.TempRoleBan:
