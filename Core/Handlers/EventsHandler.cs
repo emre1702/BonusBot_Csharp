@@ -140,12 +140,15 @@ namespace BonusBot.Core.Handlers
                 ReconnectInterval = TimeSpan.FromSeconds(3)
             });
 
-            var collection = _databaseHandler.GetCollection<CaseEntity>();
             foreach (var guild in _socketClient.Guilds)
             {
-                var guildEntity = _databaseHandler.Get<GuildEntity>(guild.Id);
+                var guildEntity = _databaseHandler.Get<GuildEntity>((long)guild.Id);
                 _roleReactionHandler.InitForGuild(guild, guildEntity);
                 CreateGitHubListenerForGuild(guild, guildEntity);
+                var collection = await _databaseHandler.GetCollection<CaseEntity, List<CaseEntity>>(collection =>
+                {
+                    return collection.FindAll().Where(entity => entity.GuildId == guild.Id).ToList();
+                });
                 await CheckCaseEntities(guild, collection);
             }
         }
@@ -167,15 +170,14 @@ namespace BonusBot.Core.Handlers
             new GitHubListener(guildEntity.GitHubWebHookListenToUrl, settings, (msg, severity, ex) =>
             {
                 if (ex != null)
-                    settings.ErrorOutputChannel?.SendMessageAsync($"WebHook [{severity.ToString()}]: {msg}:\n{ex}");
+                    settings.ErrorOutputChannel?.SendMessageAsync($"WebHook [{severity}]: {msg}:\n{ex}");
                 else
-                    settings.ErrorOutputChannel?.SendMessageAsync($"WebHook [{severity.ToString()}]: {msg}");
+                    settings.ErrorOutputChannel?.SendMessageAsync($"WebHook [{severity}]: {msg}");
             });
         }
 
-        private async Task CheckCaseEntities(SocketGuild guild, ILiteCollection<CaseEntity> collection)
+        private async Task CheckCaseEntities(SocketGuild guild, IEnumerable<CaseEntity> caseEntites)
         {
-            var caseEntites = collection.Find(entity => entity.GuildId == guild.Id);
             foreach (var entity in caseEntites)
             {
                 switch (entity.CaseType)
@@ -314,13 +316,19 @@ namespace BonusBot.Core.Handlers
 
         private async Task<bool> HandleTag(string msg, ulong guildId, ISocketMessageChannel channel)
         {
-            var tagCollection = _databaseHandler.GetCollection<TagEntity>();
-            var tag = tagCollection.FindOne(x => x.GuildId == guildId && $"{x.Id}".ToLower() == msg.ToLower());
-            if (tag == null)
+            TagEntity tag = null;
+            await _databaseHandler.GetCollection<TagEntity>(tagCollection => 
+            {
+                tag = tagCollection.FindAll().FirstOrDefault(x => x.GuildId == guildId && $"{x.Id}".ToLower() == msg.ToLower());
+                if (tag is null)
+                    return;
+                tag.Uses++;
+                tagCollection.Update(tag);
+            });
+            if (tag is null)
                 return false;
-            tag.Uses++;
             await channel.SendMessageAsync(tag.Content);
-            tagCollection.Update(tag);
+
             return true;
         }
 

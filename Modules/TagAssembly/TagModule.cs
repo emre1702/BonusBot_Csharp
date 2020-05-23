@@ -16,28 +16,22 @@ namespace TagAssembly
     public sealed class TagModule : CommandBase
     {
         private readonly DatabaseHandler _database;
-        private ILiteCollection<TagEntity> _tagsCollection;
 
         public TagModule(DatabaseHandler databaseHandler)
         {
             _database = databaseHandler;
         }
 
-        protected override void BeforeExecute(CommandInfo command)
-        {
-            _tagsCollection = _database.GetCollection<TagEntity>();
-
-            base.BeforeExecute(command);
-        }
 
         [Command("Add"), Alias("New", "N")]
         [Priority(1)]
         [TagManageProviso]
-        public Task Add(string name, [Remainder] string content)
+        public async Task Add(string name, [Remainder] string content)
         {
-            var prevTag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower());
+            var prevTag = await _database.GetCollection<TagEntity>(tagsCollection
+                => tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower()));
             if (prevTag != null)
-                return ReplyAsync($"Tag `{prevTag.Id}` already exists. Try another name?");
+                await ReplyAsync($"Tag `{prevTag.Id}` already exists. Try another name?");
 
             var tag = new TagEntity
             {
@@ -50,35 +44,37 @@ namespace TagAssembly
             };
 
             _database.Save(tag);
-            return ReplyAsync($"`{name}` tag has been created.");
+
+            await ReplyAsync($"`{name}` tag has been created.");
         }
 
         [Command("Remove"), Alias("Delete", "Del")]
         [Priority(1)]
         [TagManageProviso]
-        public Task Remove([Remainder] string name)
+        public async Task Remove([Remainder] string name)
         {
             name = name.Trim('\'', '"');
 
-            var tag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower());
-
+            var tag = await _database.GetCollection<TagEntity>(tagsCollection
+                => tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower()));
             if (tag is null)
-                return ReplyAsync($"`{name}` tag doesn't exist.");
+                await ReplyAsync($"`{name}` tag doesn't exist.");
 
-            _tagsCollection.Delete(new BsonValue(tag.Id));
-            return ReplyAsync($"Tag `{name}` has been deleted.");
+            _database.Delete(tag);
+            await ReplyAsync($"Tag `{name}` has been deleted.");
         }
 
         [Command("Info")]
         [Priority(1)]
-        public async Task<RuntimeResult> Info(string name)
+        public async Task Info(string name)
         {
             name = name.Trim('\'', '"');
 
-            var tag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower());
+            var tag = await _database.GetCollection<TagEntity>(tagsCollection
+                => tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower()));
 
             if (tag is null)
-                return Reply($"`{name}` tag doesn't exist.");
+                await ReplyAsync($"`{name}` tag doesn't exist.");
 
             var user = await Context.GetUserAsync(tag.OwnerId);
 
@@ -87,16 +83,16 @@ namespace TagAssembly
                 .AddField("Tag Content", tag.Content)
                 .AddField("Created On", tag.CreatedOn.ToLocalTime())
                 .AddField("Total Tag Uses", tag.Uses);
-
-            return Reply(embed);
+            await ReplyAsync(embed);
         }
 
         [Command("All"), Alias("List")]
         [Priority(1)]
-        public Task All()
+        public async Task All()
         {
-            var tags = string.Join(", ", _tagsCollection.Find(x => x.GuildId == Context.Guild.Id).Select(x => x.Id));
-            return ReplyAsync(tags);
+            var tags = await _database.GetCollection<TagEntity, string>(tagsCollection
+                => string.Join(", ", tagsCollection.Find(x => x.GuildId == Context.Guild.Id).Select(x => x.Id)));
+            await ReplyAsync(tags);
         }
     }
 }

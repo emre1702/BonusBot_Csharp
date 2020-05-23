@@ -4,6 +4,7 @@ using BonusBot.Common.Entities;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using LiteDB;
 
 namespace AdminAssembly
 {
@@ -57,7 +58,7 @@ Please use with X as number:
                     _rolesHandler.ChangeRolesToMute(target);
                 var caseEntity = new CaseEntity
                 {
-                    Id = muteId,
+                    Id = muteId.ToString(),
                     UserId = targetSocketUser.Id,
                     CaseType = isPerma ? CaseType.Mute : CaseType.TempMute,
                     CreatedOn = DateTimeOffset.Now,

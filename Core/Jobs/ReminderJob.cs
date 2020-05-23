@@ -23,31 +23,33 @@ namespace BonusBot.Core.Jobs
         {
             while (!CancellationTokenSource.IsCancellationRequested)
             {
-                var reminders = _database.GetCollection<ReminderEntity>().FindAll()
-                    .Where(x => x.ExpiresOn <= DateTimeOffset.Now).ToList();
+                _database.GetCollection<ReminderEntity>(collection => {
+                    var reminders = collection.FindAll()
+                        .Where(x => x.ExpiresOn <= DateTimeOffset.Now).ToList();
 
-                foreach (var reminder in reminders)
-                {
-                    var guild = _client.GetGuild(reminder.GuildId);
-                    var user = guild.GetUser(reminder.UserId);
-                    var channel = guild.GetTextChannel(reminder.ChannelId);
-
-                    switch (channel)
+                    foreach (var reminder in reminders)
                     {
-                        case null when user is null:
-                            break;
+                        var guild = _client.GetGuild(reminder.GuildId);
+                        var user = guild.GetUser(reminder.UserId);
+                        var channel = guild.GetTextChannel(reminder.ChannelId);
 
-                        case null when !(user is null):
-                            await user.SendMessageAsync(reminder.Content);
-                            break;
+                        switch (channel)
+                        {
+                            case null when user is null:
+                                break;
 
-                        default:
-                            await channel.SendMessageAsync(reminder.Content);
-                            break;
+                            case null when !(user is null):
+                                user.SendMessageAsync(reminder.Content).Wait();
+                                break;
+
+                            default:
+                                channel.SendMessageAsync(reminder.Content).Wait();
+                                break;
+                        }
+
+                        _database.Delete(reminder);
                     }
-
-                    _database.Delete(reminder);
-                }
+                }).Wait();
 
                 await Task.Delay(TaskDelay);
             }

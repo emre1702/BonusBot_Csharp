@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Globalization;
-using System.Text;
 using BonusBot.Common.Helpers;
 using Discord;
 using Discord.WebSocket;

@@ -109,7 +109,7 @@ namespace TDSConnectorServerAssembly
 
                 var channel = supportRequestCategory.Channels
                     .OfType<SocketTextChannel>()
-                    .FirstOrDefault(c => c.Name.EndsWith("support_" + request.SupportRequestId));
+                    .FirstOrDefault(c => c.Name.EndsWith("_" + request.SupportRequestId));
                 if (channel is null)
                     return new SupportRequestReply 
                     { 
@@ -186,7 +186,7 @@ namespace TDSConnectorServerAssembly
 
                 var channel = supportRequestCategory.Channels
                     .OfType<SocketTextChannel>()
-                    .FirstOrDefault(c => c.Name.EndsWith("support_" + request.SupportRequestId));
+                    .FirstOrDefault(c => c.Name.EndsWith("_" + request.SupportRequestId));
                 if (channel is null)
                     return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty,
                         ErrorType = string.Empty

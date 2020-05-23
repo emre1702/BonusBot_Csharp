@@ -5,6 +5,7 @@ using BonusBot.Common.Entities;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using LiteDB;
 
 namespace AdminAssembly
 {

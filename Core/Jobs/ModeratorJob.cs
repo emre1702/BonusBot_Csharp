@@ -5,6 +5,8 @@ using Discord.WebSocket;
 using BonusBot.Common.Entities;
 using BonusBot.Common.Helpers;
 using BonusBot.Common.Handlers;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BonusBot.Core.Jobs
 {
@@ -25,8 +27,12 @@ namespace BonusBot.Core.Jobs
         {
             while (!CancellationTokenSource.IsCancellationRequested)
             {
-                var cases = _database.GetCollection<CaseEntity>().FindAll()
-                    .Where(x => x.ExpiresOn < DateTimeOffset.Now && x.IsTempCase());
+                var cases = await _database.GetCollection<CaseEntity, List<CaseEntity>>(collection =>
+                {
+                    return collection.FindAll()
+                        .Where(x => x.ExpiresOn < DateTimeOffset.Now && x.IsTempCase())
+                        .ToList();
+                });
 
                 foreach (var userCase in cases)
                 {
@@ -39,7 +45,7 @@ namespace BonusBot.Core.Jobs
                         switch (userCase.CaseType)
                         {
                             case CaseType.TempBan:
-                                await guild.RemoveBanAsync(userCase.UserId);
+                                guild.RemoveBanAsync(userCase.UserId).Wait();
                                 break;
 
                             case CaseType.TempMute:
@@ -51,7 +57,7 @@ namespace BonusBot.Core.Jobs
                             case CaseType.TempBlock:
                                 var channel = guild.GetTextChannel(userCase.ChannelId);
                                 if (user != null)
-                                    await channel.RemovePermissionOverwriteAsync(user);
+                                    channel.RemovePermissionOverwriteAsync(user).Wait();
                                 break;
 
                             case CaseType.TempRoleBan:
@@ -69,6 +75,7 @@ namespace BonusBot.Core.Jobs
 
                     _database.Delete(userCase);
                 }
+
                 await Task.Delay(TaskDelay);
             }
         }

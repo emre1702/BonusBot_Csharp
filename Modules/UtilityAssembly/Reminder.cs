@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BonusBot.Common.Entities;
 using Discord;
 using Discord.Commands;
+using LiteDB;
 
 namespace UtilityAssembly
 {
@@ -31,7 +32,7 @@ Please use with X as number:
 
             var reminderEntity = new ReminderEntity
             {
-                Id = new Guid(),
+                Id = ObjectId.NewObjectId(),
                 ExpiresOn = dateTimeOffset.Value,
                 Content = content
             };
