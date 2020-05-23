@@ -65,7 +65,7 @@ namespace Common.Handlers
                 var reply = await _tdsClient.SupportRequest.Create(user.Id, title, text, supportType, atLeastAdminLevel);
                 if (int.TryParse(reply, out int requestId))
                 {
-                    await textChannel.ModifyAsync(c => c.Name = "support_" + requestId);
+                    await textChannel.ModifyAsync(c => c.Name = supportType.ToString() + "_" + requestId);
                     await user.SendMessageAsync($"The support request was successfully added to TDS-V.");
                 }
                 else
