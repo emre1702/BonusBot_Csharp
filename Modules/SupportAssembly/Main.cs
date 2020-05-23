@@ -115,7 +115,7 @@ namespace SupportAssembly
                 return;
             }
 
-            await _supportRequestHandler.ToggleClosedRequest(channel, Context.User, Context.User.Nickname, false, true);
+            await _supportRequestHandler.ToggleClosedRequest(channel, Context.User, Context.User.Mention, false, true);
         }
 
         [Command("close")]
@@ -132,7 +132,7 @@ namespace SupportAssembly
                 return;
             }
 
-            await _supportRequestHandler.ToggleClosedRequest(channel, Context.User, Context.User.Nickname, true, true);
+            await _supportRequestHandler.ToggleClosedRequest(channel, Context.User, Context.User.Mention, true, true);
         }
     }
 }
