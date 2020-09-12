@@ -5,10 +5,10 @@ namespace Common.Helpers
 {
     public static class StringHelper
     {
-        public static IEnumerable<string> SplitByLength(string str, int length)
+        public static IEnumerable<string> SplitByLength(this string str, int length)
         {
-            for (int i = 0; i < str.Length; i += length)
-                yield return str.Substring(i, Math.Min(length, str.Length - length * i));
+            for (int i = 0; i <= str.Length; i += length)
+                yield return str.Substring(i, length);
         }
     }
 }
