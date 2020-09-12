@@ -22,7 +22,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		Core.deps.json = Core.deps.json
 		nuget.config = nuget.config
+		publish.sh = publish.sh
 		README.md = README.md
+		ServerSync.sh = ServerSync.sh
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioAssembly", "Modules\AudioAssembly\AudioAssembly.csproj", "{94A1D783-8D81-4EEE-829D-932E9FE6FC7E}"
