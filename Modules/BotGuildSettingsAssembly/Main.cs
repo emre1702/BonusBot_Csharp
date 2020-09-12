@@ -32,7 +32,6 @@ namespace BotGuildSettingsAssembly
             _roleReactionHandler = roleReactionHandler;
         }
 
-
         protected override void BeforeExecute(CommandInfo command)
         {
             _guildEntity = _databaseHandler.Get<GuildEntity>(Context.Guild.Id);
@@ -66,7 +65,7 @@ namespace BotGuildSettingsAssembly
 
             var msg = builder.ToString();
             int maxSize = DiscordConfig.MaxMessageSize - 50;    // 50 just to be sure
-            var texts = StringHelper.SplitByLength(msg, maxSize);
+            var texts = msg.SplitByLength(maxSize);
 
             foreach (var text in texts)
             {
@@ -104,13 +103,31 @@ namespace BotGuildSettingsAssembly
             return ReplyAsync(prop.GetValue(_guildEntity).ToString());
         }
 
+        [Command("find")]
+        public async Task find(string value)
+        {
+            var properties = _guildEntity.GetType().GetProperties().Where(prop => prop.GetValue(_guildEntity).ToString() == value);
+            var strBuilder = new StringBuilder();
+            strBuilder.AppendLine("Settings with this value:");
+            strBuilder.AppendJoin("\n", properties.Select(p => p.Name));
+
+            var msg = strBuilder.ToString();
+            int maxSize = DiscordConfig.MaxMessageSize - 50;    // 50 just to be sure
+            var texts = msg.SplitByLength(maxSize);
+
+            foreach (var text in texts)
+            {
+                await ReplyAsync(text);
+            }
+        }
+
         private IEnumerable<string> GetAvailablePropertyNames()
         {
             return _guildEntity.GetType()
                 .GetProperties()
                 .Where(p => p.CanWrite
                     && p.GetCustomAttribute<NotConfigurablePropertyAttribute>() == null)
-                 .Select(p => $"{p.Name} ({p.PropertyType.Name})" );
+                 .Select(p => $"{p.Name} ({p.PropertyType.Name})");
         }
 
         private IEnumerable<string> GetNotSettedProperties()
@@ -144,18 +161,22 @@ namespace BotGuildSettingsAssembly
                     if (!uint.TryParse(value, out uint uintResult))
                         return null;
                     return uintResult;
+
                 case Type intType when intType == typeof(int):
                     if (!int.TryParse(value, out int intResult))
                         return null;
                     return intResult;
+
                 case Type ulongType when ulongType == typeof(ulong):
                     if (!ulong.TryParse(value, out ulong ulongResult))
                         return null;
                     return ulongResult;
+
                 case Type charType when charType == typeof(char):
                     if (value.Length != 1)
                         return null;
                     return value[0];
+
                 case Type boolType when boolType == typeof(bool):
                     if (value != "1" && value != "0" && !value.Equals("true", StringComparison.CurrentCultureIgnoreCase) && !value.Equals("false", StringComparison.CurrentCultureIgnoreCase))
                         return null;

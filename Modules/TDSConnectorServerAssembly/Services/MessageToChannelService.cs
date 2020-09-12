@@ -12,7 +12,6 @@ namespace TDSConnectorServerAssembly
 {
     public class MessageToChannelService : MessageToChannel.MessageToChannelBase
     {
-
         public override async Task<MessageToChannelRequestReply> Send(MessageToChannelRequest request, ServerCallContext context)
         {
             try
@@ -21,32 +20,32 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new MessageToChannelRequestReply 
-                    { 
-                        ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", 
-                        ErrorStackTrace = Environment.StackTrace, 
-                        ErrorType = string.Empty 
+                    return new MessageToChannelRequestReply
+                    {
+                        ErrorMessage = $"The guild with Id {request.GuildId} does not exist.",
+                        ErrorStackTrace = Environment.StackTrace,
+                        ErrorType = string.Empty
                     };
 
                 if (!(guild.GetChannel(request.ChannelId) is SocketTextChannel channel))
-                    return new MessageToChannelRequestReply 
-                    { 
-                        ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", 
+                    return new MessageToChannelRequestReply
+                    {
+                        ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.",
                         ErrorStackTrace = Environment.StackTrace,
                         ErrorType = string.Empty
                     };
 
                 int maxSize = DiscordConfig.MaxMessageSize - 50;    // 50 just to be sure
-                var texts = StringHelper.SplitByLength(request.Text, maxSize);
+                var texts = request.Text.SplitByLength(maxSize);
 
                 foreach (var text in texts)
                 {
                     await channel.SendMessageAsync(text);
                 }
 
-                return new MessageToChannelRequestReply 
-                { 
-                    ErrorMessage = string.Empty, 
+                return new MessageToChannelRequestReply
+                {
+                    ErrorMessage = string.Empty,
                     ErrorStackTrace = string.Empty,
                     ErrorType = string.Empty
                 };
@@ -71,17 +70,17 @@ namespace TDSConnectorServerAssembly
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
-                    return new MessageToChannelRequestReply 
-                    { 
-                        ErrorMessage = $"The guild with Id {request.GuildId} does not exist.", 
+                    return new MessageToChannelRequestReply
+                    {
+                        ErrorMessage = $"The guild with Id {request.GuildId} does not exist.",
                         ErrorStackTrace = Environment.StackTrace,
                         ErrorType = string.Empty
                     };
 
                 if (!(guild.GetChannel(request.ChannelId) is SocketTextChannel channel))
-                    return new MessageToChannelRequestReply 
-                    { 
-                        ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.", 
+                    return new MessageToChannelRequestReply
+                    {
+                        ErrorMessage = $"The channel with Id {request.ChannelId} does not exist.",
                         ErrorStackTrace = Environment.StackTrace,
                         ErrorType = string.Empty
                     };
@@ -102,12 +101,11 @@ namespace TDSConnectorServerAssembly
                 if (request.ColorR != -1 || request.ColorG != -1 || request.ColorB != -1)
                     embedBuilder.WithColor(request.ColorR != -1 ? request.ColorR : 255, request.ColorG != -1 ? request.ColorG : 255, request.ColorB != -1 ? request.ColorB : 255);
 
-
                 await channel.SendMessageAsync(embed: embedBuilder.Build());
 
-                return new MessageToChannelRequestReply 
-                { 
-                    ErrorMessage = string.Empty, 
+                return new MessageToChannelRequestReply
+                {
+                    ErrorMessage = string.Empty,
                     ErrorStackTrace = string.Empty,
                     ErrorType = string.Empty
                 };
