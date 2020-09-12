@@ -8,7 +8,7 @@ namespace Common.Helpers
         public static IEnumerable<string> SplitByLength(this string str, int length)
         {
             for (int i = 0; i <= str.Length; i += length)
-                yield return str.Substring(i, length);
+                yield return str.Substring(i, Math.Min(length, str.Length - i));
         }
     }
 }

@@ -105,7 +105,7 @@ namespace BotGuildSettingsAssembly
 
         [Command("find")]
         [Priority(1)]
-        public async Task find(string value)
+        public async Task Find(string value)
         {
             var properties = _guildEntity.GetType().GetProperties().Where(prop => prop.GetValue(_guildEntity).ToString() == value);
             var strBuilder = new StringBuilder();
