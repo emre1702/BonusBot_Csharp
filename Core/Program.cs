@@ -25,6 +25,7 @@ namespace BonusBot.Core
         private IServiceProvider _provider;
         private DiscordSocketClient _socketClient;
         private SettingsHandler _settingsHandler;
+        private bool _readyInitialized;
 
         public static Task Main()
         {
@@ -60,6 +61,10 @@ namespace BonusBot.Core
 
         private async Task SocketClient_Ready()
         {
+            if (_readyInitialized)
+                return;
+            _readyInitialized = true;
+
             var command = new CommandService(new CommandServiceConfig()
             {
                 CaseSensitiveCommands = false,
