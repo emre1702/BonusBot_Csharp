@@ -100,7 +100,7 @@ namespace BonusBot.Core
             await _provider.GetRequiredService<ModulesHandler>().LoadModulesFromAssembliesAsync();
             await _provider.GetRequiredService<CommandService>().AddModulesAsync(_assembly, _provider);
 
-            _provider.GetRequiredService<EventsHandler>();
+            await _provider.GetRequiredService<EventsHandler>().OnReady();
         }
     }
 }

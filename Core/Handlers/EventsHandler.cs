@@ -63,7 +63,6 @@ namespace BonusBot.Core.Handlers
             //_lavaSocketClient.OnTrackStuck += OnTrackStuck;
 
             socketClient.Log += OnLog;
-            socketClient.Ready += OnReady;
             socketClient.UserJoined += OnUserJoined;
             socketClient.UserLeft += OnUserLeft;
             socketClient.Disconnected += OnDisconnected;
@@ -130,7 +129,7 @@ namespace BonusBot.Core.Handlers
             return Task.CompletedTask;
         }
 
-        private async Task OnReady()
+        public async Task OnReady()
         {
             _databaseHandler.VerifyGuilds(_socketClient.Guilds.Select(x => x.Id));
             await _jobHandler.InitializeAsync();
@@ -164,7 +163,7 @@ namespace BonusBot.Core.Handlers
 
             var settings = GetWebHookSettings(guild, guildEntity);
 
-            guildEntity.GithubListener = new GitHubListener(new Uri(guildEntity.GitHubWebHookListenToUrl), settings, (msg, severity, ex) =>
+            guildEntity.GithubListener = new GitHubListener(guildEntity.GitHubWebHookListenToUrl, settings, (msg, severity, ex) =>
             {
                 if (ex != null)
                     settings.ErrorOutputChannel?.SendMessageAsync($"WebHook [{severity}]: {msg}:\n{ex}");
