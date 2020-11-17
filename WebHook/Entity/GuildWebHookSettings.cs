@@ -9,7 +9,7 @@ namespace WebHook.Entity
         public SocketGuild Guild { get; set; }
 
 #nullable enable
-        public Dictionary<PostType, ITextChannel?> OutputChannel { get; } = new Dictionary<PostType, ITextChannel?>();
+        public Dictionary<PostType, ITextChannel?> OutputChannel { get; set; } = new Dictionary<PostType, ITextChannel?>();
         public ITextChannel? ErrorOutputChannel { get; set; }
 
         public bool DeleteNeedTestingAfterLabelRemove { get; set; }
