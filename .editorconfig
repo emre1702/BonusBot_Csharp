@@ -1000,7 +1000,7 @@ dotnet_diagnostic.CA1052.severity = warning
 
 dotnet_diagnostic.CA1053.severity = warning
 
-dotnet_diagnostic.CA1054.severity = warning
+dotnet_diagnostic.CA1054.severity = none
 
 dotnet_diagnostic.CA1055.severity = warning
 

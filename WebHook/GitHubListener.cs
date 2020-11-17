@@ -19,11 +19,11 @@ namespace BonusBot.WebHook
         private HttpListener _listener;
         private readonly Action<string, LogSeverity, Exception> _logger;
         private readonly GuildWebHookSettings _settings;
-        private readonly Uri _url;
+        private readonly string _url;
         private readonly Handler _postHandler;
         private bool stopped;
 
-        public GitHubListener(Uri url, GuildWebHookSettings settings, Action<string, LogSeverity, Exception> logger)
+        public GitHubListener(string url, GuildWebHookSettings settings, Action<string, LogSeverity, Exception> logger)
         {
             if (_createdListeners.ContainsKey(settings.Guild.Id))
             {
@@ -41,7 +41,7 @@ namespace BonusBot.WebHook
             StartListenerAsync();
         }
 
-        public GitHubListener(Uri url, GuildWebHookSettings settings) : this(url, settings, (msg, severity, ex) =>
+        public GitHubListener(string url, GuildWebHookSettings settings) : this(url, settings, (msg, severity, ex) =>
         {
             ConsoleHelper.Log(severity, "WebHook", $"WebHook [{severity}]: {msg}:", ex);
         })
@@ -59,7 +59,7 @@ namespace BonusBot.WebHook
             try
             {
                 _listener = new HttpListener();
-                _listener.Prefixes.Add(_url.AbsoluteUri);
+                _listener.Prefixes.Add(_url);
                 return true;
             }
             catch (Exception ex)
