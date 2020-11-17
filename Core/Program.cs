@@ -40,6 +40,9 @@ namespace BonusBot.Core
             _socketClient = new DiscordSocketClient(new DiscordSocketConfig
             {
                 AlwaysDownloadUsers = true,
+                ConnectionTimeout = 3 * 60 * 1000,
+                DefaultRetryMode = RetryMode.AlwaysRetry,
+                HandlerTimeout = 3 * 60 * 1000
             });
             _socketClient.Ready += SocketClient_Ready;
 
