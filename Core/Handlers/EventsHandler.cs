@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using LiteDB;
 using Common.Helpers;
 using System.Threading.Channels;
+using Newtonsoft.Json;
 
 namespace BonusBot.Core.Handlers
 {
@@ -314,7 +315,8 @@ namespace BonusBot.Core.Handlers
         private async Task<bool> HandleTag(string msg, ulong guildId, ISocketMessageChannel channel)
         {
             var tagCollection = _databaseHandler.GetCollection<TagEntity>();
-            var tag = tagCollection.FindOne(x => x.GuildId == guildId && $"{x.Id}".ToLower() == msg.ToLower());
+            msg = msg.ToLower();
+            var tag = tagCollection.FindOne(x => x.GuildId == guildId && x.Id == msg);
             if (tag is null)
                 return false;
             tag.Uses++;

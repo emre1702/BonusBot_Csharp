@@ -35,7 +35,8 @@ namespace TagAssembly
         [TagManageProviso]
         public async Task Add(string name, [Remainder] string content)
         {
-            var prevTag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower());
+            name = name.ToLower();
+            var prevTag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && x.Id == name);
 
             if (prevTag != null)
                 await ReplyAsync($"Tag `{prevTag.Id}` already exists. Try another name?");
@@ -60,9 +61,9 @@ namespace TagAssembly
         [TagManageProviso]
         public async Task Remove([Remainder] string name)
         {
-            name = name.Trim('\'', '"');
+            name = name.Trim('\'', '"').ToLower();
 
-            var tag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower());
+            var tag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && x.Id == name);
             if (tag is null)
                 await ReplyAsync($"`{name}` tag doesn't exist.");
 
@@ -74,9 +75,9 @@ namespace TagAssembly
         [Priority(1)]
         public async Task Info(string name)
         {
-            name = name.Trim('\'', '"');
+            name = name.Trim('\'', '"').ToLower();
 
-            var tag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && $"{x.Id}".ToLower() == name.ToLower());
+            var tag = _tagsCollection.FindOne(x => x.GuildId == Context.Guild.Id && x.Id == name);
 
             if (tag is null)
                 await ReplyAsync($"`{name}` tag doesn't exist.");

@@ -31,7 +31,7 @@ Please use with X as number:
 
             var reminderEntity = new ReminderEntity
             {
-                Id = new Guid(),
+                Id = new Guid().ToString(),
                 ExpiresOn = dateTimeOffset.Value,
                 Content = content
             };

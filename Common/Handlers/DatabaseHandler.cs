@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using BonusBot.Common.Entities;
@@ -8,22 +9,24 @@ using LiteDB;
 
 namespace BonusBot.Common.Handlers
 {
-    public sealed class DatabaseHandler : IHandler
+    public sealed class DatabaseHandler : IHandler, IDisposable
     {
-        private readonly ConcurrentDictionary<object, BaseEntity> _cache;
+        private readonly ConcurrentDictionary<string, BaseEntity> _cache;
+        private LiteDatabase _liteDatabase;
 
         public DatabaseHandler()
         {
-            _cache = new ConcurrentDictionary<object, BaseEntity>();
+            _cache = new ConcurrentDictionary<string, BaseEntity>();
         }
 
         public T Get<T>(object id) where T : BaseEntity
         {
-            if (_cache.TryGetValue(id, out var cached))
+            var strId = id.ToString();
+            if (_cache.TryGetValue(strId, out var cached))
                 return (T)cached;
 
             var collection = GetCollection<T>();
-            var get = collection.FindOne(x => x.Id == id);
+            var get = collection.FindOne(x => x.Id == strId);
 
             if (!(get is null))
                 _cache.TryAdd(get.Id, get);
@@ -62,7 +65,7 @@ namespace BonusBot.Common.Handlers
                 .Where(x => !fetchAll.Contains(x))
                 .Select(x => new GuildEntity
                 {
-                    Id = x,
+                    Id = x.ToString(),
                     Prefix = '!',
                     WelcomeMessage = "HEY %u%, WELCOME TO %g%! Enjoy your stay!",
                     RoleForMutedSuffix = "Muted",
@@ -76,8 +79,17 @@ namespace BonusBot.Common.Handlers
 
         public ILiteCollection<T> GetCollection<T>() where T : BaseEntity
         {
-            using var database = new LiteDatabase($"{nameof(BonusBot)}.db;Upgrade=true");
-            return database.GetCollection<T>(typeof(T).Name.SanitzeEntity());
+            if (_liteDatabase is null)
+                _liteDatabase = new LiteDatabase($"Filename={nameof(BonusBot)}.db;Upgrade=true");
+            return _liteDatabase.GetCollection<T>(typeof(T).Name.SanitzeEntity());
+        }
+
+        public void Dispose()
+        {
+            _cache.Clear();
+            _liteDatabase?.Dispose();
+            _liteDatabase = null;
+            GC.SuppressFinalize(this);
         }
     }
 }
