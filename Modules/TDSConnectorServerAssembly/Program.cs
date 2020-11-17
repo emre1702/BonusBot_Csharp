@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace TDSConnectorServerAssembly
 {
-    public class Program
+    public static class Program
     {
         #nullable disable
         public static IServiceProvider ServiceProvider { get; set; }

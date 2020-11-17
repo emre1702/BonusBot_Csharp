@@ -19,7 +19,9 @@ using Victoria;
 
 namespace BonusBot.Core
 {
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable
     public sealed class Program
+#pragma warning restore CA1001 // Types that own disposable fields should be disposable
     {
         private Assembly _assembly;
         private IServiceProvider _provider;
@@ -65,12 +67,14 @@ namespace BonusBot.Core
                 return;
             _readyInitialized = true;
 
+#pragma warning disable CA2000 // Dispose objects before losing scope
             var command = new CommandService(new CommandServiceConfig()
             {
                 CaseSensitiveCommands = false,
                 DefaultRunMode = RunMode.Async,
                 LogLevel = LogSeverity.Warning
             });
+#pragma warning restore CA2000 // Dispose objects before losing scope
 
             _provider = new ServiceCollection()
                 .AddImplementedInterfaces(_assembly, typeof(IJob), typeof(IHandler))

@@ -23,6 +23,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 
+#pragma warning disable CA1051
+#pragma warning disable CA1502
 namespace DiffMatchPatch
 {
     internal static class CompatibilityExtensions

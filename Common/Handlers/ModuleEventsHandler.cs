@@ -3,7 +3,7 @@ using Discord.WebSocket;
 
 namespace Common.Handlers
 {
-    public class ModuleEventsHandler
+    public static class ModuleEventsHandler
     {
         public delegate void GitHubWebHookSettingChangedDelegate(SocketGuild guild);
 

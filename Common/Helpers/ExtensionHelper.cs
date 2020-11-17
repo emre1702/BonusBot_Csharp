@@ -121,33 +121,30 @@ namespace BonusBot.Common.Helpers
             return (double)value / 1024 / 1024;
         }
 
-        public static Cast CastTo<Cast>(this object obj)
+        public static T CastTo<T>(this object obj)
         {
-            return obj is Cast val ? val : default;
+            return obj is T val ? val : default;
         }
 
-        public static Cast CastAs<Cast>(this object obj)
+        public static T CastAs<T>(this object obj)
         {
-            return (Cast)obj;
+            return (T)obj;
         }
 
         public static string ValueToString(this object value)
         {
-            switch (value)
+            return value switch
             {
-                case LavaQueue queue:
-                    return $"Queue with {queue.Count} items.";
-                case DateTime dateTime:
-                    return dateTime.ToLocalTime().ToString(CultureInfo.DefaultThreadCurrentCulture);
-                case DateTimeOffset dateTimeOffset:
-                    return dateTimeOffset.ToLocalTime().ToString(CultureInfo.DefaultThreadCurrentCulture);
-            }
-            return value.ToString();
+                LavaQueue queue => $"Queue with {queue.Count} items.",
+                DateTime dateTime => dateTime.ToLocalTime().ToString(CultureInfo.DefaultThreadCurrentCulture),
+                DateTimeOffset dateTimeOffset => dateTimeOffset.ToLocalTime().ToString(CultureInfo.DefaultThreadCurrentCulture),
+                _ => value.ToString(),
+            };
         }
 
         public static string ObjectToString(this object obj)
         {
-            var sf = new StringFormatter();
+            using var sf = new StringFormatter();
             var properties = obj.GetType().GetRuntimeProperties();
 
             var max = properties.Max(x => x.Name.Length) + 5;

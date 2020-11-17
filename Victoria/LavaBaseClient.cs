@@ -13,20 +13,20 @@ using Victoria.Helpers;
 
 namespace Victoria
 {
-    public abstract class LavaBaseClient
+    public abstract class LavaBaseClient : IAsyncDisposable
     {
         /// <summary>
         /// Spits out important information.
         /// </summary>
-        public event Func<LogMessage, Task> Log
+        public event Func<LogMessage, Task> OnLog
         {
             add
             {
-                _log += value;
+                Log += value;
             }
             remove
             {
-                _log -= value;
+                Log -= value;
             }
         }
 
@@ -67,18 +67,19 @@ namespace Victoria
         /// Keeps up to date with <see cref="OnServerStats"/>.
         /// </summary>
         public ServerStats ServerStats { get; private set; }
+        public Func<LogMessage, Task> Log { get; set; }
 
-        private BaseSocketClient baseSocketClient;
-        private SocketHelper socketHelper;
+        private BaseSocketClient _baseSocketClient;
+        private SocketHelper _socketHelper;
         private Task disconnectTask;
-        private CancellationTokenSource cancellationTokenSource;
-        protected Configuration configuration;
-        protected Func<LogMessage, Task> _log;
-        protected ConcurrentDictionary<ulong, LavaPlayer> _players;
+        private CancellationTokenSource _cancellationTokenSource;
+        
+        protected Configuration Configuration { get; set; }
+        protected ConcurrentDictionary<ulong, LavaPlayer> Players { get; set; }
 
         protected async Task InitializeAsync(BaseSocketClient baseSocketClient, Configuration configuration)
         {
-            this.baseSocketClient = baseSocketClient;
+            this._baseSocketClient = baseSocketClient;
             var shards = baseSocketClient switch
             {
                 DiscordSocketClient socketClient
@@ -90,17 +91,17 @@ namespace Victoria
                 _ => 1
             };
 
-            this.configuration = configuration.SetInternals(baseSocketClient.CurrentUser.Id, shards);
-            _players = new ConcurrentDictionary<ulong, LavaPlayer>();
-            cancellationTokenSource = new CancellationTokenSource();
+            this.Configuration = configuration.SetInternals(baseSocketClient.CurrentUser.Id, shards);
+            Players = new ConcurrentDictionary<ulong, LavaPlayer>();
+            _cancellationTokenSource = new CancellationTokenSource();
             baseSocketClient.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
             baseSocketClient.VoiceServerUpdated += OnVoiceServerUpdated;
 
-            socketHelper = new SocketHelper(configuration, _log);
-            socketHelper.OnMessage += OnMessage;
-            socketHelper.OnClosed += OnClosedAsync;
+            _socketHelper = new SocketHelper(configuration, Log);
+            _socketHelper.OnMessage += OnMessage;
+            _socketHelper.OnClosed += OnClosedAsync;
 
-            await socketHelper.ConnectAsync().ConfigureAwait(false);
+            await _socketHelper.ConnectAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -110,12 +111,12 @@ namespace Victoria
         /// <param name="textChannel">Optional text channel that can send updates.</param>
         public async Task<LavaPlayer> ConnectAsync(IVoiceChannel voiceChannel, ITextChannel textChannel = null)
         {
-            if (_players.TryGetValue(voiceChannel.GuildId, out var player))
+            if (Players.TryGetValue(voiceChannel.GuildId, out var player))
                 return player;
 
-            await voiceChannel.ConnectAsync(configuration.SelfDeaf, false, true).ConfigureAwait(false);
-            player = new LavaPlayer(voiceChannel, textChannel, socketHelper);
-            _players.TryAdd(voiceChannel.GuildId, player);
+            await voiceChannel.ConnectAsync(Configuration.SelfDeaf, false, true).ConfigureAwait(false);
+            player = new LavaPlayer(voiceChannel, textChannel, _socketHelper);
+            Players.TryAdd(voiceChannel.GuildId, player);
 
             player.OnTrackChanged += (track) =>
             {
@@ -131,13 +132,13 @@ namespace Victoria
         /// <param name="voiceChannel">Connected voice channel.</param>
         public async Task DisconnectAsync(IVoiceChannel voiceChannel)
         {
-            if (!_players.TryRemove(voiceChannel.GuildId, out LavaPlayer player))
+            if (!Players.TryRemove(voiceChannel.GuildId, out LavaPlayer player))
                 return;
 
             await player.DisposeAsync();
             await voiceChannel.DisconnectAsync();
             var destroyPayload = new DestroyPayload(voiceChannel.GuildId);
-            await socketHelper.SendPayloadAsync(destroyPayload);
+            await _socketHelper.SendPayloadAsync(destroyPayload);
         }
 
         /// <summary>
@@ -146,7 +147,7 @@ namespace Victoria
         /// <param name="voiceChannel"><see cref="IVoiceChannel"/></param>
         public async Task MoveChannelsAsync(IVoiceChannel voiceChannel)
         {
-            if (!_players.TryGetValue(voiceChannel.GuildId, out var player))
+            if (!Players.TryGetValue(voiceChannel.GuildId, out var player))
                 return;
 
             if (player.VoiceChannel.Id == voiceChannel.Id)
@@ -154,7 +155,7 @@ namespace Victoria
 
             await player.PauseAsync();
             await player.VoiceChannel.DisconnectAsync().ConfigureAwait(false);
-            await voiceChannel.ConnectAsync(configuration.SelfDeaf, false, true).ConfigureAwait(false);
+            await voiceChannel.ConnectAsync(Configuration.SelfDeaf, false, true).ConfigureAwait(false);
             await player.ResumeAsync();
 
             player.VoiceChannel = voiceChannel;
@@ -166,7 +167,7 @@ namespace Victoria
         /// <param name="channel"><see cref="ITextChannel"/></param>
         public void UpdateTextChannel(ulong guildId, ITextChannel textChannel)
         {
-            if (!_players.TryGetValue(guildId, out var player))
+            if (!Players.TryGetValue(guildId, out var player))
                 return;
 
             player.TextChannel = textChannel;
@@ -179,48 +180,33 @@ namespace Victoria
         /// <returns><see cref="LavaPlayer"/></returns>
         public LavaPlayer GetPlayer(ulong guildId)
         {
-            return _players.TryGetValue(guildId, out var player)
+            return Players.TryGetValue(guildId, out var player)
                 ? player : default;
         }
 
         public void ToggleAutoDisconnect()
         {
-            configuration.AutoDisconnect = !configuration.AutoDisconnect;
-        }
-
-        /// <summary>
-        /// Disposes all <see cref="LavaPlayer"/>s and closes websocket connection.
-        /// </summary>
-        public async ValueTask DisposeAsync()
-        {
-            foreach (var player in _players.Values)
-            {
-                await player.DisposeAsync().ConfigureAwait(false);
-            }
-            _players.Clear();
-            _players = null;
-            await socketHelper.DisposeAsync();
-            GC.SuppressFinalize(this);
+            Configuration.AutoDisconnect = !Configuration.AutoDisconnect;
         }
 
         private async Task OnClosedAsync()
         {
-            if (configuration.PreservePlayers)
+            if (Configuration.PreservePlayers)
                 return;
 
-            foreach (var player in _players.Values)
+            foreach (var player in Players.Values)
             {
                 await DisconnectAsync(player.VoiceChannel).
                     ContinueWith(_ => player.DisposeAsync());
             }
 
-            _players.Clear();
-            _log?.WriteLog(LogSeverity.Warning, "Lavalink died. Disposed all players.");
+            Players.Clear();
+            Log?.WriteLog(LogSeverity.Warning, "Lavalink died. Disposed all players.");
         }
 
         private bool OnMessage(string message)
         {
-            _log?.WriteLog(LogSeverity.Debug, message);
+            Log?.WriteLog(LogSeverity.Debug, message);
             var json = JObject.Parse(message);
 
             var guildId = (ulong)0;
@@ -233,7 +219,7 @@ namespace Victoria
             switch (opCode)
             {
                 case "playerUpdate":
-                    if (!_players.TryGetValue(guildId, out player))
+                    if (!Players.TryGetValue(guildId, out player))
                         return false;
 
                     var state = json.GetValue("state").ToObject<PlayerState>();
@@ -250,7 +236,7 @@ namespace Victoria
 
                 case "event":
                     var evt = json.GetValue("type").ToObject<EventType>();
-                    if (!_players.TryGetValue(guildId, out player))
+                    if (!Players.TryGetValue(guildId, out player))
                         return false;
 
                     var audio = default(LavaTrack);
@@ -288,13 +274,13 @@ namespace Victoria
                             break;
 
                         default:
-                            _log?.WriteLog(LogSeverity.Warning, $"Missing implementation of {evt} event.");
+                            Log?.WriteLog(LogSeverity.Warning, $"Missing implementation of {evt} event.");
                             break;
                     }
                     break;
 
                 default:
-                    _log?.WriteLog(LogSeverity.Warning, $"Missing handling of {opCode} OP code.");
+                    Log?.WriteLog(LogSeverity.Warning, $"Missing handling of {opCode} OP code.");
                     break;
             }
 
@@ -307,13 +293,13 @@ namespace Victoria
             var guildId = channel.Guild.Id;
 
 
-            if (_players.TryGetValue(guildId, out var player)
-                && user.Id == baseSocketClient.CurrentUser.Id)
+            if (Players.TryGetValue(guildId, out var player)
+                && user.Id == _baseSocketClient.CurrentUser.Id)
             {
                 player.cachedState = newState;
             }
 
-            if (configuration.AutoDisconnect)
+            if (Configuration.AutoDisconnect)
             {
                 var users = channel.Users.Count(x => !x.IsBot);
 
@@ -322,21 +308,21 @@ namespace Victoria
                     if (disconnectTask is null)
                         return Task.CompletedTask;
 
-                    cancellationTokenSource.Cancel(false);
-                    cancellationTokenSource = new CancellationTokenSource();
+                    _cancellationTokenSource.Cancel(false);
+                    _cancellationTokenSource = new CancellationTokenSource();
                     return Task.CompletedTask;
                 }
 
                 if (!(player is null))
                 {
-                    _log?.WriteLog(LogSeverity.Warning, $"Automatically disconnecting in {configuration.InactivityTimeout.TotalSeconds} seconds.");
+                    Log?.WriteLog(LogSeverity.Warning, $"Automatically disconnecting in {Configuration.InactivityTimeout.TotalSeconds} seconds.");
                     disconnectTask = Task.Run(async () =>
                     {
-                        await Task.Delay(configuration.InactivityTimeout).ConfigureAwait(false);
+                        await Task.Delay(Configuration.InactivityTimeout).ConfigureAwait(false);
                         if (player.Status == PlayerStatus.Playing)
                             await player.StopAsync().ConfigureAwait(false);
                         await DisconnectAsync(player.VoiceChannel).ConfigureAwait(false);
-                    }, cancellationTokenSource.Token);
+                    }, _cancellationTokenSource.Token);
                 }
             }
 
@@ -345,11 +331,26 @@ namespace Victoria
 
         private Task OnVoiceServerUpdated(SocketVoiceServer server)
         {
-            if (!server.Guild.HasValue || !_players.TryGetValue(server.Guild.Id, out var player))
+            if (!server.Guild.HasValue || !Players.TryGetValue(server.Guild.Id, out var player))
                 return Task.CompletedTask;
 
             var update = new VoiceServerPayload(server, player.cachedState.VoiceSessionId);
-            return socketHelper.SendPayloadAsync(update);
+            return _socketHelper.SendPayloadAsync(update);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await (_socketHelper?.DisposeAsync() ?? default).ConfigureAwait(false);
+            _cancellationTokenSource?.Dispose();
+
+            foreach (var player in Players.Values)
+            {
+                await player.DisposeAsync().ConfigureAwait(false);
+            }
+            Players.Clear();
+            Players = null;
+
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <OutDir>..\..\Core\bin\Debug\netcoreapp3.1\</OutDir>
+    <OutDir>..\..\Core\bin\Debug\net5.0\</OutDir>
   </PropertyGroup>
 
   <ItemGroup>

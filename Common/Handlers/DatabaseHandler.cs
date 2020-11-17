@@ -49,7 +49,7 @@ namespace BonusBot.Common.Handlers
         public void Delete<T>(T document) where T : BaseEntity
         {
             var collection = GetCollection<T>();
-            collection.Delete(x => x.Id == document.Id);
+            collection.Delete(new BsonValue(document.Id));
             _cache.TryRemove(document.Id, out _);
 
         }
@@ -74,9 +74,9 @@ namespace BonusBot.Common.Handlers
             collection.InsertBulk(entities);
         }
 
-        public LiteCollection<T> GetCollection<T>() where T : BaseEntity
+        public ILiteCollection<T> GetCollection<T>() where T : BaseEntity
         {
-            using var database = new LiteDatabase($"{nameof(BonusBot)}.db");
+            using var database = new LiteDatabase($"{nameof(BonusBot)}.db;Upgrade=true");
             return database.GetCollection<T>(typeof(T).Name.SanitzeEntity());
         }
     }

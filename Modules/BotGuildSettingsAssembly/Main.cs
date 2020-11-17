@@ -85,7 +85,7 @@ namespace BotGuildSettingsAssembly
                 return ReplyAsync($"Invalid value! The type has to be {prop.PropertyType.Name}.");
 
             prop.SetValue(_guildEntity, setValue, null);
-            if (prop.GetCustomAttribute<GitHubWebHookSettingProperty>() != null)
+            if (prop.GetCustomAttribute<GitHubWebHookSettingPropertyAttribute>() != null)
                 ModuleEventsHandler.OnGitHubWebHookSettingChanged(Context.Guild);
             return ReplyAsync("Setting changed successfully.");
 
@@ -179,9 +179,9 @@ namespace BotGuildSettingsAssembly
                     return value[0];
 
                 case Type boolType when boolType == typeof(bool):
-                    if (value != "1" && value != "0" && !value.Equals("true", StringComparison.CurrentCultureIgnoreCase) && !value.Equals("false", StringComparison.CurrentCultureIgnoreCase))
+                    if (value != "1" && value != "0" && !value.Equals("true", StringComparison.OrdinalIgnoreCase) && !value.Equals("false", StringComparison.OrdinalIgnoreCase))
                         return null;
-                    return value == "1" || value.Equals("true", StringComparison.CurrentCultureIgnoreCase);
+                    return value == "1" || value.Equals("true", StringComparison.OrdinalIgnoreCase);
             }
             return value;
         }

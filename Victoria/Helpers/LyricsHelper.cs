@@ -32,7 +32,7 @@ namespace Victoria.Helpers
 
         private static Task<string> MakeRequestAsync(string url)
         {
-            return HttpHelper.Instance.GetStringAsync($"https://api.lyrics.ovh/{url}");
+            return HttpHelper.Instance.GetStringAsync(new Uri($"https://api.lyrics.ovh/{url}"));
         }
 
         private static async Task<(string Author, string Title)> SuggestAsync(string searchText)
@@ -92,7 +92,7 @@ namespace Victoria.Helpers
                 case null:
                     return (trackAuthor, title);
 
-                case var _ when string.Equals(author, trackAuthor, StringComparison.CurrentCultureIgnoreCase):
+                case var _ when string.Equals(author, trackAuthor, StringComparison.OrdinalIgnoreCase):
                     return (trackAuthor, title);
 
                 default:

@@ -53,7 +53,7 @@ namespace BonusBot.Core.Handlers
             _supportRequestHandler = supportRequestHandler;
 
             _lavaSocketClient = lavaSocketClient;
-            _lavaSocketClient.Log += OnLog;
+            _lavaSocketClient.OnLog += OnLog;
             //_lavaSocketClient.OnPlayerUpdated += OnPlayerUpdated;
             //_lavaSocketClient.OnServerStats += OnServerStats;
             //_lavaSocketClient.OnSocketClosed += OnSocketClosed;
@@ -158,13 +158,12 @@ namespace BonusBot.Core.Handlers
 
         private void CreateGitHubListenerForGuild(SocketGuild guild, GuildEntity guildEntity)
         {
-
             if (string.IsNullOrWhiteSpace(guildEntity.GitHubWebHookListenToUrl))   // || guildEntity.GitHubWebHookMessageChannelId == default)
                 return;
 
             var settings = GetWebHookSettings(guild, guildEntity);
 
-            new GitHubListener(guildEntity.GitHubWebHookListenToUrl, settings, (msg, severity, ex) =>
+            guildEntity.GithubListener = new GitHubListener(new Uri(guildEntity.GitHubWebHookListenToUrl), settings, (msg, severity, ex) =>
             {
                 if (ex != null)
                     settings.ErrorOutputChannel?.SendMessageAsync($"WebHook [{severity}]: {msg}:\n{ex}");
@@ -173,7 +172,7 @@ namespace BonusBot.Core.Handlers
             });
         }
 
-        private async Task CheckCaseEntities(SocketGuild guild, LiteCollection<CaseEntity> collection)
+        private async Task CheckCaseEntities(SocketGuild guild, ILiteCollection<CaseEntity> collection)
         {
             var caseEntites = collection.Find(entity => entity.GuildId == guild.Id);
             foreach (var entity in caseEntites)

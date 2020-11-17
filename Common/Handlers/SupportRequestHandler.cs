@@ -14,7 +14,8 @@ using Discord.WebSocket;
 
 namespace Common.Handlers
 {
-    #nullable enable
+#nullable enable
+
     public class SupportRequestHandler
     {
         private readonly ITDSClient _tdsClient;
@@ -43,10 +44,10 @@ namespace Common.Handlers
 
             var textChannel = await ChannelHelper.CreateSupportChannel(guild, supportType.ToString() + "_discord", categoryId, fromDiscord);
             await textChannel.AddPermissionOverwriteAsync(user, new OverwritePermissions(
-                viewChannel: PermValue.Allow, 
-                sendMessages: PermValue.Allow, 
-                readMessageHistory: PermValue.Allow, 
-                connect: PermValue.Allow, 
+                viewChannel: PermValue.Allow,
+                sendMessages: PermValue.Allow,
+                readMessageHistory: PermValue.Allow,
+                connect: PermValue.Allow,
                 speak: PermValue.Allow
             ));
 
@@ -86,7 +87,7 @@ namespace Common.Handlers
             {
                 var supportRequestIdStr = channel.Name.Substring(channel.Name.IndexOf('_') + 1);
                 if (!int.TryParse(supportRequestIdStr, out int supportRequestId))
-                    return false;
+                    return true;
 
                 var reply = await _tdsClient.SupportRequest.Answer(user.Id, supportRequestId, text);
                 if (reply == "-")
@@ -106,8 +107,7 @@ namespace Common.Handlers
                     return false;
                 }
                 return true;
-                    
-            }     
+            }
             return false;
         }
 
@@ -116,7 +116,7 @@ namespace Common.Handlers
             var newName = close
                 ? "closed-" + channel.Name
                 : channel.Name.Substring("closed-".Length);
-            
+
             await channel.ModifyAsync(p => p.Name = newName);
             await channel.SendMessageAsync($"The support request has been {(close ? "closed" : "opened")} by {requesterName}." +
                 $"{Environment.NewLine}To {(close ? "open" : "close")} it again you can use the command \"!support {(close ? "open" : "close")}\".");
@@ -127,7 +127,6 @@ namespace Common.Handlers
                     return;
                 await _tdsClient.SupportRequest.ToggleClosed(user!.Id, supportRequestId, close);
             }
-                
         }
 
         public async Task HandleMessage(GuildEntity guild, SocketUserMessage message)

@@ -19,12 +19,12 @@ namespace BonusBot.Common.Handlers
             switch (Type.GetTypeCode(typeof(T)))
             {
                 case TypeCode.Boolean:
-                    if (value == "1" || value.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+                    if (value == "1" || value.Equals("true", StringComparison.OrdinalIgnoreCase))
                     {
                         result = true;
                         loadSuccessful = true;
                     } 
-                    else if (value == "0" || value.Equals("false", StringComparison.CurrentCultureIgnoreCase))
+                    else if (value == "0" || value.Equals("false", StringComparison.OrdinalIgnoreCase))
                     {
                         result = false;
                         loadSuccessful = true;

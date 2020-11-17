@@ -159,8 +159,8 @@ Expires: {(isPerma ? "never" : dateTimeOffset.Value.ToString())}");
             }
 
             return Context.Guild.Roles.FirstOrDefault(r =>
-                r.Mention.Equals(roleStr, StringComparison.CurrentCultureIgnoreCase)
-                || r.Name.Equals(roleStr, StringComparison.CurrentCultureIgnoreCase));
+                r.Mention.Equals(roleStr, StringComparison.OrdinalIgnoreCase)
+                || r.Name.Equals(roleStr, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

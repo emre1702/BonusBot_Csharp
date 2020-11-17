@@ -6,17 +6,17 @@ namespace WebHook.Entity
 {
     public class GuildWebHookSettings
     {
-        public SocketGuild Guild;
+        public SocketGuild Guild { get; set; }
 
-        #nullable enable
-        public Dictionary<PostType, ITextChannel?> OutputChannel = new Dictionary<PostType, ITextChannel?>();
-        public ITextChannel? ErrorOutputChannel;
+#nullable enable
+        public Dictionary<PostType, ITextChannel?> OutputChannel { get; } = new Dictionary<PostType, ITextChannel?>();
+        public ITextChannel? ErrorOutputChannel { get; set; }
 
-        public bool DeleteNeedTestingAfterLabelRemove;
-        public bool DeleteHelpWantedAfterLabelRemove;
+        public bool DeleteNeedTestingAfterLabelRemove { get; set; }
+        public bool DeleteHelpWantedAfterLabelRemove { get; set; }
 
-        public string? BugIssueTitlePrefix;
-        public string? SuggestionIssueTitlePrefix;
-        #nullable restore
+        public string? BugIssueTitlePrefix { get; set; }
+        public string? SuggestionIssueTitlePrefix { get; set; }
+#nullable restore
     }
 }

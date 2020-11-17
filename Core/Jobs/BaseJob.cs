@@ -10,8 +10,8 @@ namespace BonusBot.Core.Jobs
     public abstract class BaseJob : IJob, IDisposable
     {
         private Task _runningTask;
-        protected CancellationTokenSource CancellationTokenSource;
-        protected TimeSpan TaskDelay = TimeSpan.FromSeconds(5);
+        protected CancellationTokenSource CancellationTokenSource { get; set; }
+        protected TimeSpan TaskDelay { get; set; } = TimeSpan.FromSeconds(5);
 
         public void Dispose()
         {

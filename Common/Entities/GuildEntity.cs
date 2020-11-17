@@ -1,5 +1,7 @@
 ﻿using BonusBot.Common.Attributes;
 using Common.Attributes;
+using Common.Interfaces;
+using LiteDB;
 
 namespace BonusBot.Common.Entities
 {
@@ -21,7 +23,9 @@ namespace BonusBot.Common.Entities
         public ulong TagsManagerRoleId { get; set; }
         public ulong RolesRequestChannelId { get; set; }
         public ulong AudioInfoChannelId { get; set; }
+#pragma warning disable CA1056 // URI-like properties should not be strings
         public string GitHubWebHookListenToUrl { get; set; }
+#pragma warning restore CA1056 // URI-like properties should not be strings
         public string WelcomeMessage { get; set; }
         public string UserLeftMessage { get; set; }
         public bool UseRolesCommandSystem { get; set; }
@@ -40,32 +44,35 @@ namespace BonusBot.Common.Entities
         public ulong AdministratorRoleId { get; set; }
 
 
-        [GitHubWebHookSettingProperty]
+        [GitHubWebHookSettingPropertyAttribute]
         public ulong GitHubWebHookPushChannelId { get; set; }
-        [GitHubWebHookSettingProperty]
+        [GitHubWebHookSettingPropertyAttribute]
         public ulong GitHubWebHookIssueOpenedChannelId { get; set; }
-        [GitHubWebHookSettingProperty]
+        [GitHubWebHookSettingPropertyAttribute]
         public ulong GitHubWebHookIssueClosedChannelId { get; set; }
-        [GitHubWebHookSettingProperty]
+        [GitHubWebHookSettingPropertyAttribute]
         public ulong GitHubWebHookIssueCommentChannelId { get; set; }
-        [GitHubWebHookSettingProperty]
+        [GitHubWebHookSettingPropertyAttribute]
         public ulong GitHubWebHookIssueInitialCommentEditedChannelId { get; set; }
-        [GitHubWebHookSettingProperty]
+        [GitHubWebHookSettingPropertyAttribute]
         public ulong GitHubWebHookIssueNeedTestingChannelId { get; set; }
-        [GitHubWebHookSettingProperty]
+        [GitHubWebHookSettingPropertyAttribute]
         public ulong GitHubWebHookIssueHelpWantedChannelId { get; set; }
-        [GitHubWebHookSettingProperty]
+        [GitHubWebHookSettingPropertyAttribute]
         public ulong GitHubWebHookErrorOutputChannelId { get; set; }
-        [GitHubWebHookSettingProperty]
+        [GitHubWebHookSettingPropertyAttribute]
         public bool GitHubWebHookIssueNeedTestingDeleteAfterRemove { get; set; }
-        [GitHubWebHookSettingProperty]
+        [GitHubWebHookSettingPropertyAttribute]
         public bool GitHubWebHookIssueHelpWantedDeleteAfterRemove { get; set; }
-        [GitHubWebHookSettingProperty]
+        [GitHubWebHookSettingPropertyAttribute]
         public string GitHubWebHookIssueBugTitlePrefix { get; set; }
-        [GitHubWebHookSettingProperty]
+        [GitHubWebHookSettingPropertyAttribute]
         public string GitHubWebHookIssueSuggestionTitlePrefix { get; set; }
 
         [NotConfigurableProperty]
         public uint LastPlayerVolume { get; set; }
+
+        [BsonIgnore]
+        public IGitHubListener GithubListener { get; set; }
     }
 }

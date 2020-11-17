@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Victoria.Helpers
 {
-    public sealed class HttpHelper
+    public sealed class HttpHelper : IDisposable
     {
         private static readonly Lazy<HttpHelper> LazyHelper
             = new Lazy<HttpHelper>(() => new HttpHelper());
@@ -20,16 +20,18 @@ namespace Victoria.Helpers
             if (!(_client is null))
                 return;
 
+#pragma warning disable CA2000 // Dispose objects before losing scope
             _client = new HttpClient(new HttpClientHandler
             {
                 UseCookies = false,
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             });
+#pragma warning restore CA2000 // Dispose objects before losing scope
             _client.DefaultRequestHeaders.Clear();
             _client.DefaultRequestHeaders.Add("User-Agent", "Victoria");
         }
 
-        public async Task<string> GetStringAsync(string url)
+        public async Task<string> GetStringAsync(Uri url)
         {
             CheckClient();
 
@@ -51,6 +53,12 @@ namespace Victoria.Helpers
 
             _client.DefaultRequestHeaders.Add(key, value);
             return this;
+        }
+
+        public void Dispose()
+        {
+            _client?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

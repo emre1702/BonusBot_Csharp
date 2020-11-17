@@ -17,8 +17,7 @@ namespace Common.Helpers
             });
 
         public static bool IsOnlyCommandsChannel(GuildEntity guild, ISocketMessageChannel channel)
-            => channel.Id == guild.SupportRequestChannelInfoId 
-            || ((channel is SocketTextChannel textChannel) && textChannel.CategoryId == guild.SupportRequestCategoryId);
+            => channel.Id == guild.SupportRequestChannelInfoId;
 
         public static bool IsSupportChannel(GuildEntity guild, ISocketMessageChannel channel)
             => channel.Id == guild.SupportRequestChannelInfoId

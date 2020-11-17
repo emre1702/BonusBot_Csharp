@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DefineConstants Condition="'$(TargetFramework)' == 'netcoreapp3.1'">C3</DefineConstants>
+    <DefineConstants Condition="'$(TargetFramework)' == 'net5.0'">C3</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

@@ -71,7 +71,7 @@ namespace Victoria
         /// <returns><see cref="SearchResult"/></returns>
         public async Task<SearchResult> SearchTracksAsync(string query)
         {
-            var url = $"http://{_rest.Host}:{_rest.Port}/loadtracks?identifier={WebUtility.UrlEncode(query)}";
+            var url = new Uri($"http://{_rest.Host}:{_rest.Port}/loadtracks?identifier={WebUtility.UrlEncode(query)}");
             var request = await HttpHelper.Instance
                 .WithCustomHeader("Authorization", _rest.Password)
                 .GetStringAsync(url).ConfigureAwait(false);

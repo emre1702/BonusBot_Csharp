@@ -124,9 +124,9 @@ Expires: {(isPerma ? "never" : dateTimeOffset.Value.ToString())}");
             var bans = await Context.Guild.GetBansAsync();
             var targetBans = bans.Where(b =>
                 b.User.Id.ToString() == targetStr
-                || b.User.Username.Equals(targetStr, StringComparison.CurrentCultureIgnoreCase)
-                || b.User.Discriminator.Equals(targetStr, StringComparison.CurrentCultureIgnoreCase)
-                || $"{b.User.Username}#{b.User.Discriminator}".Equals(targetStr, StringComparison.CurrentCultureIgnoreCase));
+                || b.User.Username.Equals(targetStr, StringComparison.OrdinalIgnoreCase)
+                || b.User.Discriminator.Equals(targetStr, StringComparison.OrdinalIgnoreCase)
+                || $"{b.User.Username}#{b.User.Discriminator}".Equals(targetStr, StringComparison.OrdinalIgnoreCase));
 
             if (!targetBans.Any())
                 return null;
@@ -135,15 +135,15 @@ Expires: {(isPerma ? "never" : dateTimeOffset.Value.ToString())}");
             if (byId.Any())
                 return byId.First().User;
 
-            var byUniqueName = targetBans.Where(b => $"{b.User.Username}#{b.User.Discriminator}".Equals(targetStr, StringComparison.CurrentCultureIgnoreCase));
+            var byUniqueName = targetBans.Where(b => $"{b.User.Username}#{b.User.Discriminator}".Equals(targetStr, StringComparison.OrdinalIgnoreCase));
             if (byUniqueName.Any())
                 return byUniqueName.First().User;
 
-            var byDiscriminator = targetBans.Where(b => b.User.Discriminator.Equals(targetStr, StringComparison.CurrentCultureIgnoreCase));
+            var byDiscriminator = targetBans.Where(b => b.User.Discriminator.Equals(targetStr, StringComparison.OrdinalIgnoreCase));
             if (byDiscriminator.Any())
                 return byDiscriminator.First().User;
 
-            var byName = targetBans.Where(b => b.User.Username.Equals(targetStr, StringComparison.CurrentCultureIgnoreCase));
+            var byName = targetBans.Where(b => b.User.Username.Equals(targetStr, StringComparison.OrdinalIgnoreCase));
             return byName.First().User;
         }
 

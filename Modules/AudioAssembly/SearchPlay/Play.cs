@@ -14,9 +14,9 @@ namespace AudioAssembly.SearchPlay
         public async Task PlaySearchResult([NumberRangeProviso(1, 20)] int number)
         {
             var lastSearchResult = _trackHandler.LastSearchResult;
-            if (lastSearchResult == null || lastSearchResult.Length == 0)
+            if (lastSearchResult == null || lastSearchResult.Count == 0)
                 await ReplyAsync("You need to search first.");
-            if (lastSearchResult.Length < number)
+            if (lastSearchResult.Count < number)
                 await ReplyAsync("The search result doesn't have so many tracks.");
 
             var audio = lastSearchResult[number - 1];

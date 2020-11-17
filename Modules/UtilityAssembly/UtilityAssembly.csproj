@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <OutDir>..\..\Core\bin\Debug\netcoreapp3.1\</OutDir>
+    <TargetFramework>net5.0</TargetFramework>
+    <OutDir>..\..\Core\bin\Debug\net5.0\</OutDir>
     <RepositoryUrl />
     <RepositoryType />
   </PropertyGroup>

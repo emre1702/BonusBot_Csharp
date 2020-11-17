@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
   <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>B:\Users\EmreKara\Desktop\Tools\GitHub\BonusBot\Core\bin\Debug\netcoreapp3.1\</OutputPath>
+    <OutputPath>B:\Users\EmreKara\Desktop\Tools\GitHub\BonusBot\Core\bin\Debug\net5.0\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>B:\Users\EmreKara\Desktop\Tools\GitHub\BonusBot\Core\bin\Release\netcoreapp3.1\</OutputPath>
+    <OutputPath>B:\Users\EmreKara\Desktop\Tools\GitHub\BonusBot\Core\bin\Release\net5.0\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,9 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.12.1" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.26.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.26.0">
+    <PackageReference Include="Google.Protobuf" Version="3.14.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.33.1" />
+    <PackageReference Include="Grpc.Tools" Version="2.33.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

@@ -58,9 +58,9 @@ namespace UtilityAssembly
 
             var possibleTargets = Context.Guild.Users.Where(u =>
                 u.Id.ToString() == targetStr
-                || u.Username.Equals(targetStr, StringComparison.CurrentCultureIgnoreCase)
-                || u.Discriminator.Equals(targetStr, StringComparison.CurrentCultureIgnoreCase)
-                || $"{u.Username}#{u.Discriminator}".Equals(targetStr, StringComparison.CurrentCultureIgnoreCase));
+                || u.Username.Equals(targetStr, StringComparison.OrdinalIgnoreCase)
+                || u.Discriminator.Equals(targetStr, StringComparison.OrdinalIgnoreCase)
+                || $"{u.Username}#{u.Discriminator}".Equals(targetStr, StringComparison.OrdinalIgnoreCase));
 
             if (!possibleTargets.Any())
                 return null;
@@ -69,15 +69,15 @@ namespace UtilityAssembly
             if (target != null)
                 return target;
 
-            target = possibleTargets.Where(u => $"{u.Username}#{u.Discriminator}".Equals(targetStr, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+            target = possibleTargets.Where(u => $"{u.Username}#{u.Discriminator}".Equals(targetStr, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
             if (target != null)
                 return target;
 
-            target = possibleTargets.Where(u => u.Discriminator.Equals(targetStr, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+            target = possibleTargets.Where(u => u.Discriminator.Equals(targetStr, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
             if (target != null)
                 return target;
 
-            target = possibleTargets.Where(u => u.Username.Equals(targetStr, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+            target = possibleTargets.Where(u => u.Username.Equals(targetStr, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
             return target;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace Victoria.Entities
 {
@@ -16,5 +17,27 @@ namespace Victoria.Entities
         /// </summary>
         [JsonProperty("gain")]
         public double Gain { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not EqualizerBand other)
+                return false;
+            return Band == other.Band && Gain == other.Gain;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Band, Gain);
+        }
+
+        public static bool operator ==(EqualizerBand left, EqualizerBand right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(EqualizerBand left, EqualizerBand right)
+        {
+            return !(left == right);
+        }
     }
 }

@@ -2,8 +2,8 @@
 {
     public static class SettingsDefault
     {
-        public static string Token = "token";
-        public static string BotName = "name";
-        public static string BotPlayingStatus = "playing";
+        public static string Token { get; set; } = "token";
+        public static string BotName { get; set; } = "name";
+        public static string BotPlayingStatus { get; set; } = "playing";
     }
 }

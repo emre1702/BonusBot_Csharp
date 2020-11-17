@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BonusBot.Common.Attributes
 {
-    public class TagManageProvisoAttribute : PreconditionAttribute
+    public sealed class TagManageProvisoAttribute : PreconditionAttribute
     {
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {

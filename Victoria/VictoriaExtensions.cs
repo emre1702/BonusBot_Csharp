@@ -35,7 +35,7 @@ namespace Victoria
                     break;
             }
 
-            var req = await HttpHelper.Instance.GetStringAsync(url);
+            var req = await HttpHelper.Instance.GetStringAsync(new Uri(url));
             var parse = JObject.Parse(req);
             return !parse.TryGetValue("thumbnail_url", out var thumb)
                 ? "https://i.imgur.com/YPCEUDK.gif"

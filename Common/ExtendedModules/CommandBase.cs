@@ -107,20 +107,20 @@ namespace BonusBot.Common.ExtendedModules
         {
             return time == "-1"
                 || time == "-"
-                || time.Equals("perma", StringComparison.CurrentCultureIgnoreCase)
-                || time.Equals("permamute", StringComparison.CurrentCultureIgnoreCase)
-                || time.Equals("permaban", StringComparison.CurrentCultureIgnoreCase)
-                || time.Equals("permanent", StringComparison.CurrentCultureIgnoreCase)
-                || time.Equals("never", StringComparison.CurrentCultureIgnoreCase);
+                || time.Equals("perma", StringComparison.OrdinalIgnoreCase)
+                || time.Equals("permamute", StringComparison.OrdinalIgnoreCase)
+                || time.Equals("permaban", StringComparison.OrdinalIgnoreCase)
+                || time.Equals("permanent", StringComparison.OrdinalIgnoreCase)
+                || time.Equals("never", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool IsUnmute(string time)
         {
             return time == "0"
-                || time.Equals("unmute", StringComparison.CurrentCultureIgnoreCase)
-                || time.Equals("unban", StringComparison.CurrentCultureIgnoreCase)
-                || time.Equals("stop", StringComparison.CurrentCultureIgnoreCase)
-                || time.Equals("no", StringComparison.CurrentCultureIgnoreCase);
+                || time.Equals("unmute", StringComparison.OrdinalIgnoreCase)
+                || time.Equals("unban", StringComparison.OrdinalIgnoreCase)
+                || time.Equals("stop", StringComparison.OrdinalIgnoreCase)
+                || time.Equals("no", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

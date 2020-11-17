@@ -3,7 +3,7 @@
 namespace BonusBot.Common.Attributes
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class NotConfigurablePropertyAttribute : Attribute
+    public sealed class NotConfigurablePropertyAttribute : Attribute
     {
     }
 }

@@ -63,7 +63,7 @@ namespace AudioAssembly.SearchPlay
 
             var builder = new StringBuilder();
             int i = 0;
-            _trackHandler.LastSearchResult = search.Tracks.Take(amount).ToArray();
+            _trackHandler.LastSearchResult = search.Tracks.Take(amount).ToList();
             foreach (var track in _trackHandler.LastSearchResult)
             {
                 builder.AppendLine($"{++i}. {track.Title} - {track.Author}");
