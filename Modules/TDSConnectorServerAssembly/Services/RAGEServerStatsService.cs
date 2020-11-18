@@ -16,6 +16,7 @@ namespace TDSConnectorServerAssembly
     public class RAGEServerStatsService : RAGEServerStats.RAGEServerStatsBase
     {
         private static Timer? _checkServerOfflineTimer;
+        private static RequestOptions _requestOptions = new RequestOptions { RetryMode = RetryMode.AlwaysFail, Timeout = 5000 };
 
         public override async Task<RAGEServerStatsRequestReply> Send(RAGEServerStatsRequest request, ServerCallContext context)
         {
@@ -46,7 +47,7 @@ namespace TDSConnectorServerAssembly
                         ErrorType = string.Empty
                     };
 
-                await channel.ModifyAsync((properties) => properties.Name = "Server: Online", new RequestOptions { RetryMode = RetryMode.AlwaysRetry });
+                await channel.ModifyAsync((properties) => properties.Name = "Server: Online", _requestOptions);
 
                 var datetimeNow = DateTimeOffset.UtcNow;
                 var embedBuilder = new EmbedBuilder()
@@ -68,11 +69,11 @@ namespace TDSConnectorServerAssembly
                             new EmbedFieldBuilder { IsInline = true, Name = "Online since", Value = request.OnlineSince },
                         }); ;
 
-                var msgList = await channel.GetMessagesAsync(1).FlattenAsync();
+                var msgList = await channel.GetMessagesAsync(1, _requestOptions).FlattenAsync();
                 var msg = msgList.FirstOrDefault();
                 if (!(msg is RestUserMessage message))
                 {
-                    await channel.SendMessageAsync(embed: embedBuilder.Build());
+                    await channel.SendMessageAsync(embed: embedBuilder.Build(), options: _requestOptions);
                 }
                 else
                 {
@@ -80,15 +81,15 @@ namespace TDSConnectorServerAssembly
                     {
                         properties.Embed = embedBuilder.Build();
                         properties.Content = null;
-                    });
+                    }, _requestOptions);
                 }
 
                 _checkServerOfflineTimer = new Timer(request.RefreshFrequencySec * 1000 * 1.5);
                 _checkServerOfflineTimer.Elapsed += async (_, __) =>
                 {
-                    await channel.ModifyAsync((properties) => properties.Name = "Server: Offline");
+                    await channel.ModifyAsync((properties) => properties.Name = "Server: Offline", _requestOptions);
 
-                    var msgList = await channel.GetMessagesAsync(1, new RequestOptions { RetryMode = RetryMode.AlwaysRetry, Timeout = 5000 }).FlattenAsync();
+                    var msgList = await channel.GetMessagesAsync(1, _requestOptions).FlattenAsync();
                     var msg = msgList.FirstOrDefault();
 
                     if (msg is RestUserMessage message)
@@ -97,11 +98,20 @@ namespace TDSConnectorServerAssembly
                         {
                             properties.Embed = null;
                             properties.Content = "Last online: " + GetUniversalDateTimeString(datetimeNow);
-                        });
+                        }, _requestOptions);
                     }
                 };
                 _checkServerOfflineTimer.Start();
 
+                return new RAGEServerStatsRequestReply
+                {
+                    ErrorMessage = string.Empty,
+                    ErrorStackTrace = string.Empty,
+                    ErrorType = string.Empty
+                };
+            }
+            catch (TimeoutException)
+            {
                 return new RAGEServerStatsRequestReply
                 {
                     ErrorMessage = string.Empty,
