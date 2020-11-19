@@ -162,15 +162,18 @@ namespace WebHook.PostHandler
         public static IEnumerable<string> SplitForEmbedDescription(string str)
         {
             var chunkLength = MAX_DESCRIPTION_LENGTH;
-            if (String.IsNullOrEmpty(str)) throw new ArgumentException("String is null or empty.");
+            if (String.IsNullOrEmpty(str)) yield return "";
             if (chunkLength < 1) throw new ArgumentException($"The max description length is less than 1 ({chunkLength}).");
 
-            for (int i = 0; i < str.Length; i += chunkLength)
+            if (str is { })
             {
-                if (chunkLength + i > str.Length)
-                    chunkLength = str.Length - i;
+                for (int i = 0; i < str.Length; i += chunkLength)
+                {
+                    if (chunkLength + i > str.Length)
+                        chunkLength = str.Length - i;
 
-                yield return str.Substring(i, chunkLength);
+                    yield return str.Substring(i, chunkLength);
+                }
             }
         }
     }
