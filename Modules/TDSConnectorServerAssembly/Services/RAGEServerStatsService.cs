@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Timers;
 using Discord;
@@ -119,7 +121,7 @@ namespace TDSConnectorServerAssembly
                     ErrorType = string.Empty
                 };
             }
-            catch (HttpException)
+            catch (Exception ex) when (ex is HttpException or HttpRequestException)
             {
                 return new RAGEServerStatsRequestReply
                 {
