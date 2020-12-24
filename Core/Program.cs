@@ -51,10 +51,10 @@ namespace BonusBot.Core
             CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("de-DE");
 
             ConsoleHelper.PrintHeader();
-            Metrics.Collector = new CollectorConfiguration()
+            /*Metrics.Collector = new CollectorConfiguration()
                 .Batch.AtInterval(TimeSpan.FromSeconds(5))
                 .WriteTo.InfluxDB("http://127.0.0.1:8086", nameof(BonusBot))
-                .CreateCollector();
+                .CreateCollector();*/
 
             _settingsHandler = new SettingsHandler();
             var botToken = _settingsHandler.Get<string>(SettingsDefault.Token);
@@ -91,7 +91,8 @@ namespace BonusBot.Core
                     typeof(AudioInfoHandler),
                     typeof(RolesHandler),
                     typeof(RoleReactionHandler),
-                    typeof(SupportRequestHandler))
+                    typeof(SupportRequestHandler),
+                    typeof(TDSConnectorServer.TDSServer))
                 .AddSingleton(command)
                 .AddSingleton(_socketClient)
                 .AddSingleton(_settingsHandler)
@@ -100,6 +101,8 @@ namespace BonusBot.Core
 
             await _provider.GetRequiredService<ModulesHandler>().LoadModulesFromAssembliesAsync();
             await _provider.GetRequiredService<CommandService>().AddModulesAsync(_assembly, _provider);
+
+            _provider.GetRequiredService<TDSConnectorServer.TDSServer>().Start(_provider);
 
             await _provider.GetRequiredService<EventsHandler>().OnReady();
         }

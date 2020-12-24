@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj" />
-    <ProjectReference Include="..\..\TDSConnectorClient\TDSConnectorClient.csproj" />
+    <ProjectReference Include="..\..\TDSConnector\Client\TDSConnectorClient.csproj" />
   </ItemGroup>
 
 </Project>

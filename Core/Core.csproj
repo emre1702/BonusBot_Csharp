@@ -21,8 +21,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\Modules\TDSConnectorServerAssembly\TDSConnectorServerAssembly.csproj" />
-    <ProjectReference Include="..\TDSConnectorClient\TDSConnectorClient.csproj" />
+    <ProjectReference Include="..\TDSConnector\Server\TDSConnectorServer.csproj" />
+    <ProjectReference Include="..\TDSConnector\Client\TDSConnectorClient.csproj" />
     <ProjectReference Include="..\WebHook\WebHook.csproj" />
   </ItemGroup>
 

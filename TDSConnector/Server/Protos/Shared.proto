@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "TDSConnectorServerAssembly";
+option csharp_namespace = "TDSConnectorServer";
 
 message EmbedField {
     string name = 1;

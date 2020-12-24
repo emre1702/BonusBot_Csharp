@@ -11,7 +11,7 @@ using Discord.WebSocket;
 using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace TDSConnectorServerAssembly
+namespace TDSConnectorServer
 {
     public class SupportRequestService : SupportRequest.SupportRequestBase
     {
@@ -19,7 +19,7 @@ namespace TDSConnectorServerAssembly
         {
             try
             {
-                var client = Program.ServiceProvider.GetRequiredService<DiscordSocketClient>();
+                var client = TDSServer.ServiceProvider.GetRequiredService<DiscordSocketClient>();
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
@@ -41,7 +41,7 @@ namespace TDSConnectorServerAssembly
                         ErrorType = string.Empty
                     };
 
-                await Program.ServiceProvider.GetRequiredService<SupportRequestHandler>()
+                await TDSServer.ServiceProvider.GetRequiredService<SupportRequestHandler>()
                     .CreateRequest(guild, user, request.AuthorName, request.Title, request.Text, (SupportType)request.SupportType, request.AtLeastAdminLevel, false);
 
                 return new SupportRequestCreateReply
@@ -69,7 +69,7 @@ namespace TDSConnectorServerAssembly
         {
             try
             {
-                var client = Program.ServiceProvider.GetRequiredService<DiscordSocketClient>();
+                var client = TDSServer.ServiceProvider.GetRequiredService<DiscordSocketClient>();
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
@@ -80,7 +80,7 @@ namespace TDSConnectorServerAssembly
                         ErrorType = string.Empty
                     };
 
-                var guildEntity = Program.ServiceProvider.GetRequiredService<DatabaseHandler>()
+                var guildEntity = TDSServer.ServiceProvider.GetRequiredService<DatabaseHandler>()
                     .Get<GuildEntity>(guild.Id);
                 if (guildEntity is null)
                     return new SupportRequestReply 
@@ -118,7 +118,7 @@ namespace TDSConnectorServerAssembly
                         ErrorType = string.Empty
                     };
 
-                var supportRequestHandler = Program.ServiceProvider.GetRequiredService<SupportRequestHandler>();
+                var supportRequestHandler = TDSServer.ServiceProvider.GetRequiredService<SupportRequestHandler>();
                 if (channel.Name.StartsWith("closed-"))
                     await supportRequestHandler.ToggleClosedRequest(channel, null, request.AuthorName, false, false);
 
@@ -149,7 +149,7 @@ namespace TDSConnectorServerAssembly
         {
             try
             {
-                var client = Program.ServiceProvider.GetRequiredService<DiscordSocketClient>();
+                var client = TDSServer.ServiceProvider.GetRequiredService<DiscordSocketClient>();
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)
@@ -160,7 +160,7 @@ namespace TDSConnectorServerAssembly
                         ErrorType = string.Empty
                     };
 
-                var guildEntity = Program.ServiceProvider.GetRequiredService<DatabaseHandler>()
+                var guildEntity = TDSServer.ServiceProvider.GetRequiredService<DatabaseHandler>()
                     .Get<GuildEntity>(guild.Id);
                 if (guildEntity is null)
                     return new SupportRequestReply 
@@ -192,7 +192,7 @@ namespace TDSConnectorServerAssembly
                         ErrorType = string.Empty
                     };
 
-                await Program.ServiceProvider.GetRequiredService<SupportRequestHandler>()
+                await TDSServer.ServiceProvider.GetRequiredService<SupportRequestHandler>()
                     .ToggleClosedRequest(channel, null, request.RequesterName, request.Closed, false);
 
                 return new SupportRequestReply { ErrorMessage = string.Empty, ErrorStackTrace = string.Empty,

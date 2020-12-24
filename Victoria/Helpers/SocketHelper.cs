@@ -8,6 +8,7 @@ using System.Text;
 using Victoria.Entities.Payloads;
 using Newtonsoft.Json;
 using Discord;
+using System.Diagnostics;
 
 namespace Victoria.Helpers
 {
@@ -35,6 +36,9 @@ namespace Victoria.Helpers
 
         public async Task ConnectAsync()
         {
+            if (Debugger.IsAttached)
+                return;
+
             _cancellationTokenSource = new CancellationTokenSource();
 
             _clientWebSocket = new ClientWebSocket();

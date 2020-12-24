@@ -13,7 +13,7 @@ using Discord.WebSocket;
 using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace TDSConnectorServerAssembly
+namespace TDSConnectorServer
 {
     public class RAGEServerStatsService : RAGEServerStats.RAGEServerStatsBase
     {
@@ -30,7 +30,7 @@ namespace TDSConnectorServerAssembly
                     _checkServerOfflineTimer = null;
                 }
 
-                var client = Program.ServiceProvider.GetRequiredService<DiscordSocketClient>();
+                var client = TDSServer.ServiceProvider.GetRequiredService<DiscordSocketClient>();
 
                 var guild = client.GetGuild(request.GuildId);
                 if (guild is null)

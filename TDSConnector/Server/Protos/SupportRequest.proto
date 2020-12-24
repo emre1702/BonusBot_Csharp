@@ -2,7 +2,7 @@ syntax = "proto3";
 
 //import "Protos/Shared.proto";
 
-option csharp_namespace = "TDSConnectorServerAssembly";
+option csharp_namespace = "TDSConnectorServer";
 
 service SupportRequest {
   rpc Create (SupportRequestCreateRequest) returns (SupportRequestCreateReply);

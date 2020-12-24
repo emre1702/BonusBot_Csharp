@@ -1,3 +1,3 @@
-dotnet publish -o build -c Release -r ubuntu.19.04-x64
+dotnet publish -o build -c Debug -r ubuntu.19.04-x64
 
 pause
