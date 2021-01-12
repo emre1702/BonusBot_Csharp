@@ -2,7 +2,7 @@
 
 namespace WebHook.Entity.GitHub
 {
-    class Base
+    internal class Base
     {
         [JsonProperty("ref")]
         public string Ref { get; set; }
@@ -35,6 +35,6 @@ namespace WebHook.Entity.GitHub
         public Changes Changes { get; set; }
 
         [JsonIgnore]
-        public string Branch => Ref.Split('/')[^1];
+        public string Branch => Ref["refs/heads/".Length..];
     }
 }
