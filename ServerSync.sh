@@ -16,7 +16,7 @@ LIGHTCYAN='\033[1;36m'
 WHITE='\033[1;37m'
 SEPERATOR='==============================='
 
-cd /cygdrive/b/Users/EmreKara/Desktop/Tools/GitHub/BonusBot/build
+cd /cygdrive/c/Programming/BonusBot/build
 
 echo -e "${SEPERATOR}"
 echo -e "Update ${LIGHTBLUE}Bonusbot ${NOCOLOR}..."
