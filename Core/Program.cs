@@ -12,7 +12,6 @@ using Common.Interfaces;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using InfluxDB.Collector;
 using Microsoft.Extensions.DependencyInjection;
 using TDSConnectorClient;
 using Victoria;
@@ -20,6 +19,7 @@ using Victoria;
 namespace BonusBot.Core
 {
 #pragma warning disable CA1001 // Types that own disposable fields should be disposable
+
     public sealed class Program
 #pragma warning restore CA1001 // Types that own disposable fields should be disposable
     {
