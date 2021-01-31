@@ -34,13 +34,9 @@ RUN useradd -m -d /home/bonusbot bonusbot
 WORKDIR /home/bonusbot
 
 COPY --from=build-env /bonusbot-source/build .
-COPY --from=build-env /bonusbot-source/BonusBot.db /bonusbot-source/BonusBot.db
 
 RUN [ ! -d /bonusbot-data ] && mkdir -p /bonusbot-data; exit 0
-RUN [ ! -d /bonusbot-data/BonusBot.db ] && cp /bonusbot-source/BonusBot.db /bonusbot-data; exit 0
 
-RUN cp /bonusbot-source/BonusBot.db .
-    
 # Expose Ports and start the Server
 ADD ./entrypoint.sh ./entrypoint.sh
 EXPOSE 443/tcp 3000 5000

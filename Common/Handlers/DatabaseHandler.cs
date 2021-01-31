@@ -54,7 +54,6 @@ namespace BonusBot.Common.Handlers
             var collection = GetCollection<T>();
             collection.Delete(new BsonValue(document.Id));
             _cache.TryRemove(document.Id, out _);
-
         }
 
         public void VerifyGuilds(IEnumerable<ulong> guildIds)
@@ -80,7 +79,7 @@ namespace BonusBot.Common.Handlers
         public ILiteCollection<T> GetCollection<T>() where T : BaseEntity
         {
             if (_liteDatabase is null)
-                _liteDatabase = new LiteDatabase($"Filename={nameof(BonusBot)}.db;Upgrade=true");
+                _liteDatabase = new LiteDatabase($"Filename=/bonusbot-data/{nameof(BonusBot)}.db;Upgrade=true");
             return _liteDatabase.GetCollection<T>(typeof(T).Name.SanitzeEntity());
         }
 
