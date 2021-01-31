@@ -11,7 +11,7 @@ namespace Victoria
         /// <summary>
         /// Lavalink host.
         /// </summary>
-        public string Host { get; set; } = "127.0.0.1";
+        public string Host { get; set; } = "lavalink";
 
         /// <summary>
         /// Lavalink port.

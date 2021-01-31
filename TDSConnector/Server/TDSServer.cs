@@ -16,13 +16,12 @@ namespace TDSConnectorServer
 
         public TDSServer()
         {
-            
         }
 
         public async void Start(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
-            try 
+            try
             {
                 await CreateHostBuilder().Build().RunAsync();
             }
@@ -32,8 +31,6 @@ namespace TDSConnectorServer
             }
         }
 
-        // Additional configuration is required to successfully run gRPC on macOS.
-        // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
         public IHostBuilder CreateHostBuilder() =>
             Host.CreateDefaultBuilder()
                 .ConfigureLogging((ILoggingBuilder logging) =>
@@ -46,12 +43,13 @@ namespace TDSConnectorServer
                         .UseStartup<Startup>()
                         .ConfigureKestrel(options =>
                         {
-                            options.Listen(IPAddress.Loopback, 5000, listenOptions =>
+                            options.ListenAnyIP(5000, listenOptions => listenOptions.Protocols = HttpProtocols.Http2);
+                            /*options.Listen(IPAddress.Any, 5000, listenOptions =>
                             {
                                 listenOptions.Protocols = HttpProtocols.Http2;
-                                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                                    listenOptions.UseHttps("/home/localhost.pfx", "grpc");
-                            });
+                                //if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                                //listenOptions.UseHttps("/bonusbot-data/TDSConnectorServer.pfx", "tdsv");
+                            });*/
                         });
                 });
 
