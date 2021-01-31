@@ -1,0 +1,7 @@
+**/bin
+**/obj
+**/.vscode
+**/.vs
+**/.git
+**/.github
+build
