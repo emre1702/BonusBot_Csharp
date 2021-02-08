@@ -37,12 +37,11 @@ COPY --from=build-env /bonusbot-source/build .
 
 RUN [ ! -d /bonusbot-data ] && mkdir -p /bonusbot-data; exit 0
 
-# Expose Ports and start the Server
 ADD ./entrypoint.sh ./entrypoint.sh
 EXPOSE 443/tcp 3000 5000
 
 RUN chown -R bonusbot:bonusbot . \
-    && chown -R bonusbot:bonusbot /bonusbot-data/ \
+    && chown -R bonusbot:bonusbot /bonusbot-data \
     && chmod +x Core \
     && chmod +x entrypoint.sh
 
