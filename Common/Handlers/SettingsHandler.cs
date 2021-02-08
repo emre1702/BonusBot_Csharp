@@ -1,6 +1,5 @@
-﻿using System;
-using System.Configuration;
-using BonusBot.Common.Interfaces;
+﻿using BonusBot.Common.Interfaces;
+using System;
 
 namespace BonusBot.Common.Handlers
 {
@@ -8,10 +7,10 @@ namespace BonusBot.Common.Handlers
     {
         public T Get<T>(string key, out bool loadSuccessful)
         {
-            string value = ConfigurationManager.AppSettings[key];
+            var value = Environment.GetEnvironmentVariable("BONUSBOT_" + key.ToUpper());
             object result = default(T);
             loadSuccessful = false;
-            if (value == null)
+            if (value is null)
             {
                 return (T)Convert.ChangeType(result, typeof(T));
             }
@@ -23,17 +22,19 @@ namespace BonusBot.Common.Handlers
                     {
                         result = true;
                         loadSuccessful = true;
-                    } 
+                    }
                     else if (value == "0" || value.Equals("false", StringComparison.OrdinalIgnoreCase))
                     {
                         result = false;
                         loadSuccessful = true;
                     }
                     break;
+
                 case TypeCode.Char:
                     result = value.Substring(0, 1);
                     loadSuccessful = true;
                     break;
+
                 case TypeCode.Int32:
                     if (int.TryParse(value, out int i))
                     {
@@ -41,6 +42,7 @@ namespace BonusBot.Common.Handlers
                         loadSuccessful = true;
                     }
                     break;
+
                 case TypeCode.String:
                     result = value;
                     loadSuccessful = true;
