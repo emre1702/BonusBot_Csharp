@@ -1,3 +1,6 @@
+### THIS REPOSITORY IS OLD! 
+### Please use https://github.com/emre1702/BonusBot instead!
+##
 # BonusBot_Csharp
 Discord Bot written in C#, using Discord.Net and Victoria code, LiteDB and LavaPlayer.  
 Can play Youtube, SoundCloud etc. audio, give roles and more.  
